@@ -17,9 +17,11 @@ class PublicCalendarController extends Controller
         $start = $current->copy()->startOfMonth();
         $end = $current->copy()->endOfMonth();
 
-       $bookings = Booking::with('facilities')
+        $bookings = Booking::with('facilities')
             ->whereBetween('start_time', [$start, $end])
             ->whereIn('status', ['reserved', 'rescheduled'])
+            ->orderBy('start_time')
+            ->get();
 
         $days = $this->groupByDay($bookings);
 

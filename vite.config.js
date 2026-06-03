@@ -14,5 +14,21 @@ export default defineConfig({
         watch: {
             ignored: ['**/storage/framework/views/**'],
         },
+        // Disable HMR in production or when behind reverse proxy
+        hmr: process.env.NODE_ENV === 'production' ? false : {
+            protocol: 'ws',
+            host: 'localhost',
+            port: 5173,
+        },
+    },
+    build: {
+        // Optimize build output
+        rollupOptions: {
+            output: {
+                manualChunks: undefined,
+            },
+        },
+        // Increase chunk size warning
+        chunkSizeWarningLimit: 1000,
     },
 });

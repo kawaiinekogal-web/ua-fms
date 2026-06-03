@@ -140,8 +140,17 @@
             </div>
         </div>
 
+        {{-- Attachments (optional) --}}
+        <div>
+            <label class="block text-sm font-medium text-gray-700 mb-2">Attachments (Optional)</label>
+            <p class="text-xs text-gray-600 mb-2">Upload supporting documents (PDFs only, max 5-10 files)</p>
+            <input type="file" name="attachments[]" multiple accept=".pdf" 
+                   class="w-full border border-gray-300 rounded-md py-2 px-3 text-sm bg-white hover:border-gray-400 focus:outline-none focus:ring-1 focus:ring-blue-500"
+                   title="Select 5-10 PDF files maximum">
+        </div>
+
         {{-- Submit --}}
-        <div class="flex justify-end space-x-4">
+        <div class="flex justify-end space-x-4 pt-4">
             <a href="{{ route('org.dashboard') }}" class="px-4 py-2 border border-gray-300 rounded-md text-gray-700 hover:bg-gray-50">
                 Cancel
             </a>

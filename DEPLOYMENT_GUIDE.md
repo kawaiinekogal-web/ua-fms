@@ -7,8 +7,17 @@ Configuration is driven by environment variables. You can move between developme
 The platform includes:
 
 - **Laravel backend** — web application, hidden portal entry, and dashboards
-- **Legacy desktop launchers** — optional legacy clients retained for compatibility
+- **Legacy desktop launchers** — optional clients retained only for compatibility
 - **Optional mobile WebView clients** — if you ship them separately, use the same `FMS_LOGIN_URL` and `FMS_ACCESS_TOKEN` as Laravel
+
+### Legacy data normalization
+
+- The app includes a migration that converts old `bookings.status = 'booked'` (and any `form_submissions.status = 'booked'`) to `reserved`.
+- On boot, `AppServiceProvider` additionally:
+  - Normalizes any leftover `booked` rows to `reserved`.
+  - Marks `reserved` bookings with `end_time < now()` as `completed`.
+
+This ensures your production environment never has mixed `booked` and `reserved` statuses and that historical reservations transition to `completed` automatically.
 
 ## Environment variables
 

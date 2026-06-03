@@ -28,9 +28,13 @@ Route::middleware(['auth'])->group(function () {
         ->name('notifications.read');
 });
 
-// home route for viewer/general: public read-only calendar
-Route::get('/', [PublicCalendarController::class, 'index'])
+// home route for viewer/general
+Route::get('/', [\App\Http\Controllers\PublicCalendarController::class, 'index'])
     ->name('home');
+
+
+
+
 
 // Simple health check (for debugging)
 Route::get('/healthz', function () {
@@ -67,8 +71,8 @@ Route::middleware(['auth', 'role:admin'])->group(function () {
         ->name('admin.forms.facilities.approve');
     Route::post('/admin/forms/facilities/{submission}/disapprove', [\App\Http\Controllers\Admin\FormSubmissionController::class, 'disapprove'])
         ->name('admin.forms.facilities.disapprove');
-    Route::post('/admin/forms/facilities/{submission}/set-booking', [\App\Http\Controllers\Admin\FormSubmissionController::class, 'setBooking'])
-        ->name('admin.forms.facilities.set-booking');
+    Route::post('/admin/forms/facilities/{submission}/set-reservation', [\App\Http\Controllers\Admin\FormSubmissionController::class, 'setReservation'])
+        ->name('admin.forms.facilities.set-reservation');
 
     // Generate PDF for approved facilities requests
     Route::get(
@@ -115,10 +119,12 @@ Route::middleware(['auth', 'role:college_staff'])->group(function () {
     Route::put('/college/facilities/{facility}', [CollegeFacilityController::class, 'update'])->name('college.facilities.update');
     Route::delete('/college/facilities/{facility}', [CollegeFacilityController::class, 'destroy'])->name('college.facilities.destroy');
 
-    // Bookings list (existing page, untouched)
-    Route::get('/college/bookings', function () {
-        return view('college.bookings.index');
-    })->name('college.bookings.index');
+    // Bookings list (now routed through controller)
+    Route::get(
+        '/college/bookings',
+        [\App\Http\Controllers\College\BookingController::class, 'index']
+    )->name('college.bookings.index');
+
 
     // College booking calendar (read-only)
     Route::get('/college/calendar', [\App\Http\Controllers\College\BookingController::class, 'calendar'])
@@ -138,15 +144,22 @@ Route::middleware(['auth', 'role:college_staff'])->group(function () {
         '/college/requests/facilities/{submission}',
         [\App\Http\Controllers\College\FormController::class, 'showFacilities']
     )->name('college.requests.facilities.show');
+
+    Route::post(
+        '/college/requests/facilities/{submission}/cancel',
+        [\App\Http\Controllers\College\FormController::class, 'cancelFacilities']
+    )->name('college.requests.facilities.cancel');
 });
 
 // Org Staff
 Route::middleware(['auth', 'role:org_staff'])->group(function () {
     Route::get('/org/dashboard', [OrgDashboardController::class, 'index'])->name('org.dashboard');
 
-    // Booking calendar (read-only for this org staff)
-    Route::get('/org/bookings', [\App\Http\Controllers\Org\BookingController::class, 'calendar'])
+    // Bookings
+    Route::get('/org/bookings', [\App\Http\Controllers\Org\BookingController::class, 'index'])
         ->name('org.bookings.index');
+    Route::get('/org/calendar', [\App\Http\Controllers\Org\BookingController::class, 'calendar'])
+        ->name('org.bookings.calendar');
 
     // Facilities Utilization Form (Org → GSU)
     Route::get('/org/requests/facilities', [OrgFormController::class, 'createFacilities'])
@@ -157,64 +170,9 @@ Route::middleware(['auth', 'role:org_staff'])->group(function () {
         ->name('org.requests.facilities.index');
     Route::get('/org/requests/facilities/{submission}', [OrgFormController::class, 'showFacilities'])
         ->name('org.requests.facilities.show');
+
+    Route::post(
+        '/org/requests/facilities/{submission}/cancel',
+        [OrgFormController::class, 'cancelFacilities']
+    )->name('org.requests.facilities.cancel');
 });
-
-// TEMP: create test users for login (remove after you test)
-use App\Models\User;
-use Illuminate\Support\Facades\Hash;
-
-Route::get('/make-admin', function () {
-    $user = User::updateOrCreate(
-        ['email' => 'admin@example.com'],
-        [
-            'name' => 'Admin User',
-            'password' => Hash::make('password123'),
-            'role' => 'admin',
-        ]
-    );
-
-    return $user;
-});
-
-Route::get('/make-college-staff', function () {
-    $user = User::updateOrCreate(
-        ['email' => 'college@example.com'],
-        [
-            'name' => 'College Staff User',
-            'password' => Hash::make('password123'),
-            'role' => 'college_staff',
-            'college_name' => 'College of Engineering',
-        ]
-    );
-
-    return $user;
-});
-
-Route::get('/make-org-staff', function () {
-    $user = User::updateOrCreate(
-        ['email' => 'org@example.com'],
-        [
-            'name' => 'Organization Staff User',
-            'password' => Hash::make('password123'),
-            'role' => 'org_staff',
-            'organization_name' => 'Student Council',
-        ]
-    );
-
-    return $user;
-});
-
-Route::get('/make-user', function () {
-    $user = User::updateOrCreate(
-        ['email' => 'user@example.com'],
-        [
-            'name' => 'Regular User',
-            'password' => Hash::make('password123'),
-            'role' => 'viewer',
-        ]
-    );
-
-    return $user;
-});
-
-

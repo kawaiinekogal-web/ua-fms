@@ -20,7 +20,7 @@ class FacilitiesFormPdfController extends Controller
      */
     public function generate(FormSubmission $submission): BinaryFileResponse
     {
-        if ($submission->type !== 'facilities_utilization' || ! in_array($submission->status, ['approved', 'booked'], true)) {
+        if ($submission->type !== 'facilities_utilization' || ! in_array($submission->status, ['approved', 'reserved'], true)) {
             abort(404);
         }
 

@@ -1,4 +1,4 @@
-# Quick Start Guide - UA Facility Management System
+# Quick Start Guide – UA Facility Management System (Web Portal)
 
 This guide will get you up and running in under 10 minutes.
 

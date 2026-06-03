@@ -11,6 +11,8 @@ Role-based login accounts for the current web app are now seeded by `database/se
 
 For standard web deployment, use seeded users instead of the legacy `/make-*` helper routes.
 
+Legacy data note: if your database predates the 2026-06 status normalization, any `booked` rows in `bookings` / `form_submissions` are automatically converted to `reserved` by a one‑time migration and a safety check in `AppServiceProvider`. Active reservations are now tracked under the `reserved` status; past reservations with `end_time` in the past are auto‑marked `completed`.
+
 ---
 
 ## 1. Seeder-created sample users

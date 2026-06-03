@@ -4,7 +4,7 @@
 @section('admin-content')
 <div class="fms-card">
     <div class="fms-page-header border-0 pb-0 mb-4">
-        <h1 class="fms-page-title">Create Direct Booking</h1>
+        <h1 class="fms-page-title">Create Direct Reservation</h1>
         <a href="{{ route('admin.bookings.index') }}" class="fms-link">← Back to bookings</a>
     </div>
 

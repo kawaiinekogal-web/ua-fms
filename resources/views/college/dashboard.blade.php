@@ -6,7 +6,7 @@
             <h1 class="fms-page-title">College Staff Dashboard</h1>
         </div>
         <p class="mb-6 text-sm text-neutral-600">
-            Manage your college facilities, bookings, and utilization requests from the sidebar.
+            Manage your college facilities, bookings, and  Approve Requests from the sidebar.
         </p>
 
         <h2 class="mb-3 text-sm font-semibold uppercase tracking-widest text-neutral-500">Quick access</h2>

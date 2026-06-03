@@ -3,7 +3,7 @@
 @section('college-content')
 <div class="bg-white rounded shadow p-6">
     <div class="flex items-center justify-between mb-6">
-        <h1 class="text-2xl font-semibold">Facilities Request #{{ $submission->id }}</h1>
+        <h1 class="text-2xl font-semibold">{{ $payload['control_no'] ?? 'Pending Request' }}</h1>
         <a href="{{ route('college.requests.index') }}" class="px-4 py-2 bg-gray-200 text-gray-800 rounded hover:bg-gray-300 text-sm">
             Back to requests
         </a>
@@ -16,7 +16,20 @@
         </div>
         <div>
             <dt class="font-semibold text-gray-700">Status</dt>
-            <dd class="text-gray-800">{{ ucfirst($submission->status) }}</dd>
+            <dd class="text-gray-800">
+                {{ ucfirst($submission->status) }}
+                @if($submission->status === 'pending')
+                    <form method="POST"
+                          action="{{ route('college.requests.facilities.cancel', $submission) }}"
+                          class="inline-block ml-3"
+                          onsubmit="return confirm('Cancel this request? This cannot be undone.');">
+                        @csrf
+                        <button type="submit" class="px-2 py-1 border border-gray-400 rounded text-xs hover:bg-gray-100">
+                            Cancel request
+                        </button>
+                    </form>
+                @endif
+            </dd>
         </div>
         <div>
             <dt class="font-semibold text-gray-700">Date of Activity</dt>

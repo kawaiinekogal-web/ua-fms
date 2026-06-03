@@ -43,7 +43,7 @@ class StoreFacilitiesUtilizationRequest extends FormRequest
                         $query->where('start_time', '<', $endDateTime)
                               ->where('end_time', '>', $startDateTime);
                     })
-                    ->whereIn('status', ['booked'])
+                    ->whereIn('status', ['reserved'])
                     ->exists();
 
                     if ($isOverlapping) {

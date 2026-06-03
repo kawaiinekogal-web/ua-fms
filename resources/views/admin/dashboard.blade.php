@@ -14,7 +14,7 @@
         <p>Manage campus facilities and equipment</p>
     </a>
     <a href="{{ route('admin.forms.facilities.index') }}" class="admin-card">
-        <h3>Utilization Requests</h3>
+        <h3> Approve Requests</h3>
         <p>Review and approve facility utilization submissions</p>
     </a>
     <a href="{{ route('admin.bookings.index') }}" class="admin-card">

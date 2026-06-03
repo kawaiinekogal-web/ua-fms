@@ -67,7 +67,7 @@ All routes are defined in the web route file and use session-based authenticatio
 #### Form Submission Review
 | Method | URI | Route Name | Controller | Description |
 |---|---|---|---|---|
-| GET | `/admin/forms/facilities` | `admin.forms.facilities.index` | `Admin\FormSubmissionController@index` | List all utilization requests |
+| GET | `/admin/forms/facilities` | `admin.forms.facilities.index` | `Admin\FormSubmissionController@index` | List all  Approve Requests |
 | GET | `/admin/forms/facilities/{submission}` | `admin.forms.facilities.show` | `Admin\FormSubmissionController@show` | View a single request |
 | POST | `/admin/forms/facilities/{submission}/approve` | `admin.forms.facilities.approve` | `Admin\FormSubmissionController@approve` | Approve request |
 | POST | `/admin/forms/facilities/{submission}/disapprove` | `admin.forms.facilities.disapprove` | `Admin\FormSubmissionController@disapprove` | Disapprove request |
@@ -81,15 +81,15 @@ All routes are defined in the web route file and use session-based authenticatio
 | GET | `/admin/users/create` | `admin.users.create` | `Admin\UserController@create` | Show create user form |
 | POST | `/admin/users` | `admin.users.store` | `Admin\UserController@store` | Store new user |
 
-#### Booking Management
+#### Booking / Reservation Management
 | Method | URI | Route Name | Controller | Description |
 |---|---|---|---|---|
-| GET | `/admin/bookings` | `admin.bookings.index` | `Admin\BookingController@index` | List all bookings |
+| GET | `/admin/bookings` | `admin.bookings.index` | `Admin\BookingController@index` | List all reservations (reserved / rescheduled / cancelled / completed) |
 | GET | `/admin/bookings/{booking}/edit` | `admin.bookings.edit` | `Admin\BookingController@edit` | View/edit booking |
 | POST | `/admin/bookings/{booking}` | `admin.bookings.update` | `Admin\BookingController@update` | Update booking (reschedule) |
 | POST | `/admin/bookings/{booking}/cancel` | `admin.bookings.cancel` | `Admin\BookingController@cancel` | Cancel booking |
-| GET | `/admin/calendar` | `admin.calendar` | `Admin\BookingController@calendar` | Monthly calendar view |
-| GET | `/admin/overview` | `admin.overview` | `Admin\BookingController@overview` | Monthly overview chart |
+| GET | `/admin/calendar` | `admin.calendar` | `Admin\BookingController@calendar` | Monthly reservation calendar (reserved / rescheduled) |
+| GET | `/admin/overview` | `admin.overview` | `Admin\BookingController@overview` | Monthly reservations per facility (bar graph) |
 
 ### College Staff Routes (`auth` + `role:college_staff`)
 
@@ -112,12 +112,12 @@ All routes are defined in the web route file and use session-based authenticatio
 #### Bookings
 | Method | URI | Route Name | Controller | Description |
 |---|---|---|---|---|
-| GET | `/college/bookings` | `college.bookings.index` | Closure (inline) | Booking requests placeholder page |
+| GET | `/college/bookings` | `college.bookings.index` | `College\BookingController@index` | List own reservations with filters |
 
-#### Facilities Utilization Requests
+#### Facilities  Approve Requests
 | Method | URI | Route Name | Controller | Description |
 |---|---|---|---|---|
-| GET | `/college/requests` | `college.requests.index` | `College\FormController@indexFacilities` | List own utilization requests |
+| GET | `/college/requests` | `college.requests.index` | `College\FormController@indexFacilities` | List own  Approve Requests |
 | GET | `/college/requests/facilities` | `college.requests.facilities.create` | `College\FormController@createFacilities` | Show new request form |
 | POST | `/college/requests/facilities` | `college.requests.facilities.store` | `College\FormController@storeFacilities` | Submit new request |
 | GET | `/college/requests/facilities/{submission}` | `college.requests.facilities.show` | `College\FormController@showFacilities` | View a single request |
@@ -127,10 +127,10 @@ All routes are defined in the web route file and use session-based authenticatio
 | Method | URI | Route Name | Controller | Description |
 |---|---|---|---|---|
 | GET | `/org/dashboard` | `org.dashboard` | `Org\DashboardController@index` | Organization staff dashboard |
-| GET | `/org/bookings` | `org.bookings.index` | `Org\BookingController@calendar` | Read-only booking calendar |
+| GET | `/org/bookings` | `org.bookings.index` | `Org\BookingController@index` | List own reservations with filters |
 | GET | `/org/requests/facilities` | `org.requests.facilities.create` | `Org\FormController@createFacilities` | Show new request form |
 | POST | `/org/requests/facilities` | `org.requests.facilities.store` | `Org\FormController@storeFacilities` | Submit new request |
-| GET | `/org/requests/facilities/index` | `org.requests.facilities.index` | `Org\FormController@indexFacilities` | List own utilization requests |
+| GET | `/org/requests/facilities/index` | `org.requests.facilities.index` | `Org\FormController@indexFacilities` | List own  Approve Requests |
 
 ### GSU High-priority Direct Booking Routes (Admin)
 
@@ -185,8 +185,7 @@ Extends `layouts.app`. Provides the admin portal shell with sidebar navigation.
 |---|---|
 | Overview | Dashboard |
 | Facilities | All facilities, Add facility |
-| Requests | Utilization requests, Bookings, Booking calendar, Monthly overview |
-| GSU forms (PDF) | Facilities utilization form, Repair & maintenance form |
+| Requests |  Approve Requests, Bookings, Booking calendar, Monthly overview |
 | Administration | Users, Create user |
 
 **Content Section:** `@yield('admin-content')`
@@ -311,14 +310,14 @@ Admin welcome dashboard with quick-access card links.
 | Card | Links To | Description |
 |---|---|---|
 | Facilities | `admin.facilities.index` | Manage campus facilities and equipment |
-| Utilization requests | `admin.forms.facilities.index` | Review and approve facility utilization submissions |
+|  Approve Requests | `admin.forms.facilities.index` | Review and approve facility utilization submissions |
 | Bookings | `admin.bookings.index` | View and adjust confirmed bookings |
 | User management | `admin.users.index` | Create and manage portal accounts |
 
 **GSU Forms Cards:**
 | Card | Links To | Description |
 |---|---|---|
-| Facilities & utilization form | `forms.facilities.show` | Generate PDF for facility utilization requests |
+| Facilities & utilization form | `forms.facilities.show` | Generate PDF for facility  Approve Requests |
 | Repair & maintenance form | `forms.repair.show` | Generate PDF for repair and maintenance requests |
 
 ---
@@ -451,7 +450,7 @@ Monthly booking analytics chart.
 **Route:** `GET /admin/forms/facilities` → `admin.forms.facilities.index`
 **Layout:** `layouts.admin`
 
-Paginated table of all facilities utilization requests (from college and org staff).
+Paginated table of all facilities  Approve Requests (from college and org staff).
 
 **Table Columns:** ID, Requester (name), Unit, Status (color-coded badge: yellow=pending, green=approved, red=disapproved), Submitted (date), Actions ("View" link)
 
@@ -645,7 +644,7 @@ Form to submit a facilities utilization request to GSU.
 **Route:** `GET /college/requests` → `college.requests.index`
 **Layout:** `layouts.college`
 
-Paginated table of the college staff's own utilization requests.
+Paginated table of the college staff's own  Approve Requests.
 
 **Table Columns:** Date Requested, Activity Date, Time, Purpose (truncated 50 chars), Status (badge), Actions ("View" link)
 
@@ -723,7 +722,7 @@ Read-only monthly calendar showing bookings requested by the organization.
 **Route:** `GET /org/requests/facilities/index` → `org.requests.facilities.index`
 **Layout:** `layouts.org`
 
-Paginated table of the org staff's own utilization requests. Same structure as the college version.
+Paginated table of the org staff's own  Approve Requests. Same structure as the college version.
 
 **Table Columns:** Date Requested, Activity Date, Time, Purpose, Status (badge), Actions ("View" link)
 
@@ -829,7 +828,7 @@ admin/
 ├── overview/
 │   └── index.blade.php         ← Monthly overview chart
 ├── forms/
-│   ├── facilities_index.blade.php  ← Utilization requests list
+│   ├── facilities_index.blade.php  ←  Approve Requests list
 │   ├── facilities_show.blade.php   ← Request detail + actions
 │   ├── index.blade.php         ← Legacy tabbed submissions view
 │   ├── show.blade.php          ← Legacy submission detail

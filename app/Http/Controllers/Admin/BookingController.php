@@ -13,17 +13,56 @@ use Carbon\Carbon;
 class BookingController extends Controller
 {
     public function __construct(
-        protected BookingService $bookingService
+        protected BookingService $bookingService,
+        protected \App\Services\NotificationService $notificationService
     ) {}
 
-    public function index()
+    public function index(Request $request)
     {
-        $bookings = Booking::with(['requester', 'facilities'])
-            ->whereIn('status', ['booked', 'rescheduled', 'cancelled'])
-            ->orderByDesc('start_time')
+        $query = Booking::with(['requester', 'facilities'])
+            ->whereIn('status', ['booked', 'rescheduled', 'cancelled', 'completed']);
+
+        // Filter by status
+        if ($request->filled('status')) {
+            $query->where('status', $request->input('status'));
+        }
+
+        // Filter by facility
+        if ($request->filled('facility_id')) {
+            $facilityId = $request->input('facility_id');
+            $query->whereHas('facilities', function ($q) use ($facilityId) {
+                $q->where('facility_id', $facilityId);
+            });
+        }
+
+        // Filter by month (based on start_time)
+        if ($request->filled('month')) {
+            $month = $request->input('month'); // format: YYYY-MM
+            $query->whereRaw('YEAR(start_time) = YEAR(?) AND MONTH(start_time) = MONTH(?)', [$month . '-01', $month . '-01']);
+        }
+
+        // Search by facility name or purpose or requester name
+        if ($request->filled('search')) {
+            $search = $request->input('search');
+            $query->where('purpose', 'like', '%' . $search . '%')
+                  ->orWhereHas('facilities', function ($q) use ($search) {
+                      $q->where('name', 'like', '%' . $search . '%');
+                  })
+                  ->orWhereHas('requester', function ($q) use ($search) {
+                      $q->where('name', 'like', '%' . $search . '%');
+                  });
+        }
+
+        // Sort by start_time descending
+        $bookings = $query->orderByDesc('start_time')
             ->paginate(20);
 
-        return view('admin.bookings.index', compact('bookings'));
+        // Get available facilities for filter dropdown
+        $facilities = Facility::where('is_active', true)
+            ->orderBy('name')
+            ->get();
+
+        return view('admin.bookings.index', compact('bookings', 'facilities'));
     }
 
     public function createDirect()
@@ -92,7 +131,7 @@ class BookingController extends Controller
                             ->where('end_time', '>', $start);
                     });
             })
-            ->whereIn('status', ['booked', 'rescheduled'])
+            ->whereIn('status', ['reserved', 'rescheduled'])
             ->orderBy('start_time')
             ->get();
 
@@ -122,7 +161,7 @@ class BookingController extends Controller
             ->map(function ($facility) use ($start, $end) {
                 $count = $facility->bookings()
                     ->whereBetween('start_time', [$start, $end])
-                    ->whereIn('status', ['booked', 'rescheduled'])
+                    ->whereIn('status', ['reserved', 'rescheduled'])
                     ->count();
 
                 return [
@@ -158,7 +197,7 @@ class BookingController extends Controller
 
         $bookings = Booking::with('facilities')
             ->whereBetween('start_time', [$start, $end])
-            ->whereIn('status', ['booked', 'rescheduled'])
+            ->whereIn('status', ['reserved', 'rescheduled'])
             ->get();
 
         // Core facilities (seeded UA core list)
@@ -272,31 +311,22 @@ class BookingController extends Controller
         $booking->additional_details = $updatedDetails;
         $booking->save();
 
-        // Notify requester (college/org staff)
+        // Notify requester and other admins
         if ($booking->requester) {
-            Notification::create([
-                'user_id' => $booking->requester_id,
-                'type'    => 'booking_rescheduled',
-                'title'   => 'Booking updated by GSU',
-                'message' => 'GSU has changed your booking ('.$booking->booking_code.'). Reason: '.$data['reason'],
-                'data'    => [
-                    'booking_id'  => $booking->id,
-                ],
-            ]);
+            $this->notificationService->notifyBookingRescheduled(
+                $booking->requester_id,
+                $booking->booking_code,
+                $data['reason'],
+                $booking->id,
+                $booking->facilities->first()->id ?? 0
+            );
         }
 
-        // Notify other admin accounts (for audit; optional)
-        foreach (\App\Models\User::where('role', 'admin')->where('id', '!=', auth()->id())->get() as $admin) {
-            Notification::create([
-                'user_id' => $admin->id,
-                'type'    => 'booking_rescheduled_admin',
-                'title'   => 'Booking updated',
-                'message' => 'Booking '.$booking->booking_code.' was rescheduled by '.auth()->user()->name.'.',
-                'data'    => [
-                    'booking_id' => $booking->id,
-                ],
-            ]);
-        }
+        $this->notificationService->notifyAdminsOfBookingUpdate(
+            $booking->id,
+            $booking->booking_code,
+            auth()->user()->name
+        );
 
         return redirect()->route('admin.bookings.index')
             ->with('status', 'Booking updated and requester notified.');
@@ -326,19 +356,20 @@ class BookingController extends Controller
         $booking->additional_details = $details; // array; cast will JSON it
         $booking->save();
 
-
         if ($booking->requester) {
-            Notification::create([
-                'user_id' => $booking->requester_id,
-                'type'    => 'booking_cancelled',
-                'title'   => 'Booking cancelled by GSU',
-                'message' => 'Your booking ('.$booking->booking_code.') was cancelled by GSU. Reason: '.$data['reason'],
-                'data'    => [
-                    'booking_id' => $booking->id,
-                ],
-            ]);
+            $this->notificationService->notifyBookingCancelled(
+                $booking->requester_id,
+                $booking->booking_code,
+                $data['reason'],
+                $booking->id
+            );
         }
 
+        $this->notificationService->notifyAdminsOfBookingCancellation(
+            $booking->id,
+            $booking->booking_code,
+            auth()->user()->name
+        );
 
         return redirect()->route('admin.bookings.index')
             ->with('status', 'Booking cancelled and requester notified.');

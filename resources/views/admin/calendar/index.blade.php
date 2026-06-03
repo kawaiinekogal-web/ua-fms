@@ -13,7 +13,7 @@
 <div class="fms-card">
     <div class="fms-page-header border-0 pb-0 mb-4">
         <div>
-            <h1 class="fms-page-title">Booking Calendar</h1>
+            <h1 class="fms-page-title">Reservation Calendar</h1>
             <p class="text-xs text-neutral-600">Month view of all approved bookings with facility and purpose details.</p>
         </div>
         <div class="flex items-center gap-2 text-sm">

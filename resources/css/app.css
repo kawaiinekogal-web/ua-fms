@@ -40,7 +40,7 @@
 
 @layer components {
     .fms-shell {
-        @apply flex min-h-[calc(100dvh-9rem)] gap-0 border-t border-black;
+        @apply flex min-h-[calc(100dvh-9rem)] gap-0 border border-black;
     }
 
     .fms-sidebar {
@@ -51,7 +51,7 @@
         overflow-y: auto;
         scrollbar-width: none;
         -ms-overflow-style: none;
-        background-color: #111111;
+        background-color: #ffffff;
     }
 
     .fms-sidebar::-webkit-scrollbar {
@@ -67,11 +67,12 @@
     }
 
     .fms-sidebar-subtitle {
-        @apply mt-1 text-sm text-neutral-600;
+        @apply mt-3 text-sm text-neutral-600;
     }
 
     .fms-sidebar-nav {
         @apply flex-1 overflow-y-auto px-3 py-4;
+        color: #000000 !important;
     }
 
     .fms-nav-group {
@@ -99,7 +100,9 @@
     }
 
     .fms-main {
-        @apply min-w-0 flex-1 bg-white px-6 py-6;
+        @apply min-w-0 flex-1 bg-white px-4 py-6;
+        border: 1px solid #000000;
+        margin: 12px;
     }
 
     .fms-card {
@@ -314,30 +317,21 @@
     */
 
     /* ── 1. GLOBAL LAYOUT HEADER (BLACK MONOCHROME TRANSFORMATION) ── */
-    nav,
-    header,
-    .navbar,
-    .top-bar,
-    div[class*="bg-white"][class*="border-b"] {
+    /* Only style our main app header (layouts/app via layouts/partials/header) */
+    .main-header {
         background: #111111 !important;
         background-color: #111111 !important;
         border-bottom: 1px solid #222222 !important;
     }
 
-    nav a, nav span, nav div,
-    header a, header span, header div,
-    .navbar a, .navbar span,
-    div[class*="bg-white"][class*="border-b"] a,
-    div[class*="bg-white"][class*="border-b"] span,
-    div[class*="bg-white"][class*="border-b"] div {
+    .main-header a,
+    .main-header span,
+    .main-header div {
         color: #ffffff !important;
         font-family: 'DM Sans', sans-serif;
     }
 
-    nav button,
-    header button,
-    .navbar button,
-    div[class*="bg-white"][class*="border-b"] button {
+    .main-header button {
         background: none !important;
         border: 1px solid #ffffff !important;
         color: #ffffff !important;
@@ -346,13 +340,11 @@
         transition: all 0.2s ease !important;
     }
 
-    nav button:hover,
-    header button:hover,
-    .navbar button:hover,
-    div[class*="bg-white"][class*="border-b"] button:hover {
+    .main-header button:hover {
         background: #ffffff !important;
         color: #111111 !important;
     }
+
 
     /* ── 2. DYNAMIC HEADER BRANDING BLOCK (CIRCULAR LOGO + TWO-LINE STACK) ── */
     .header-brand-container {
@@ -409,20 +401,7 @@
     button[onclick*="history"],
     .back-btn,
     .back-button,
-    /* Suppress layout footers */
-    footer:not(.admin-custom-footer),
-    body > footer,
-    .layout-footer {
-        display: none !important;
-        visibility: hidden !important;
-        opacity: 0 !important;
-        pointer-events: none !important;
-        height: 0 !important;
-        width: 0 !important;
-        overflow: hidden !important;
-        padding: 0 !important;
-        margin: 0 !important;
-    }
+
 
     /* ── 4. SIDEBAR PROFILE BRIGHTNESS & SLATE HOVER DESIGN ── */
     .fms-shell > :first-child > div:first-child,
@@ -459,6 +438,8 @@
         display: flex !important;
         min-height: calc(100vh - 70px) !important;
         width: 100% !important;
+        background: #ffffff !important;
+        opacity: 1 !important;
     }
 
     .fms-main {
@@ -569,20 +550,7 @@
         line-height: 1.5;
     }
 
-    /* ── 7. MONTHLY OVERVIEW BLADE BREAKOUT RESCUE POSITIONER ── */
-    .fms-shell ~ div,
-    nav ~ div:not(.fms-shell) {
-        position: absolute !important;
-        top: 70px !important;                 /* Safely bounds the chart box below your top layout header */
-        left: 256px !important;               /* Offsets horizontally past the 64w black menu bar */
-        width: calc(100% - 256px) !important; /* Spans perfectly across your white dashboard workspace window */
-        height: calc(100vh - 140px) !important;/* Constraints chart canvas bounds above bottom footer line */
-        background: #ffffff !important;
-        padding: 32px 40px !important;
-        box-sizing: border-box !important;
-        z-index: 10 !important;               /* Embeds cleanly into the main center layout perspective */
-        overflow-y: auto !important;          /* Keeps scrolling fluid inside the workspace boundary if content clips */
-    }
+
 
 
 }
@@ -856,16 +824,19 @@
 /* ── STRICT MONOCHROME PORTRAIT PORTAL SECTION ── */
 /* ── STRICT MONOCHROME PORTRAIT PORTAL SECTION ── */
 .ua-portal-section {
-  padding: 60px 48px;
-  max-width: 1100px;
+  padding: 48px 48px 40px; /* Added horizontal padding + tighter vertical spacing */
+  max-width: 1280px; /* Matches Tailwind's max-w-5xl */
   margin: 0 auto;
 }
+
 
 .ua-portal-grid {
   display: grid;
   grid-template-columns: 0.9fr 1.1fr;
   gap: 64px;
   align-items: start;
+  max-width: 900px; /* Adjust this value if needed for desired width */
+  margin: 0 auto;
 }
 
 @media (max-width: 992px) {
@@ -959,12 +930,11 @@
 
 /* ── MINIMALIST HORIZONTAL RECTANGLE FACILITIES GRID ── */
 .ua-facilities-section {
-  padding: 60px 24px;
-  max-width: 1200px;
+  padding: 0 48px 16px; /* Added horizontal padding + match portal horizontal spacing */
+  max-width: 1280px; /* Matches Tailwind's max-w-5xl */
   margin: 0 auto;
-  width: 100%;
-  box-sizing: border-box;
 }
+
 
 .ua-section-header {
   margin-bottom: 32px;

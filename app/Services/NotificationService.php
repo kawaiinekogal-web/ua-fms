@@ -111,4 +111,26 @@ class NotificationService
             ['booking_id' => $bookingId]
         );
     }
+
+    public function notifyAdminsOfBookingUpdate(int $bookingId, string $bookingCode, string $adminName): void
+    {
+        $this->notifyAdminsExcept(
+            auth()->id(),
+            'booking_rescheduled_admin',
+            'Booking updated',
+            "Booking {$bookingCode} was rescheduled by {$adminName}.",
+            ['booking_id' => $bookingId]
+        );
+    }
+
+    public function notifyAdminsOfBookingCancellation(int $bookingId, string $bookingCode, string $adminName): void
+    {
+        $this->notifyAdminsExcept(
+            auth()->id(),
+            'booking_cancelled_admin',
+            'Booking cancelled',
+            "Booking {$bookingCode} was cancelled by {$adminName}.",
+            ['booking_id' => $bookingId]
+        );
+    }
 }

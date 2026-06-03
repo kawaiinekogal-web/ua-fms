@@ -14,7 +14,7 @@ class FormSubmission extends Model
         'requester_id',
         'requester_type', // 'college', 'org', 'admin'
         'requester_unit', // e.g. college_name or organization_name
-        'status',         // 'pending', 'approved', 'disapproved', 'cancelled', 'booked'
+        'status',         // 'pending', 'approved', 'disapproved', 'cancelled', 'reserved'
         'payload',        // JSON string
     ];
 
@@ -51,14 +51,14 @@ class FormSubmission extends Model
 
     public function markBooked(): void
     {
-        $this->status = 'booked';
+        $this->status = 'reserved';
         $this->save();
     }
 
     // Backward-compat (if older code still references converted)
     public function markConverted(): void
     {
-        $this->status = 'booked';
+        $this->status = 'reserved';
         $this->save();
     }
 

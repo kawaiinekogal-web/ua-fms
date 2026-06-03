@@ -1,5 +1,13 @@
 # Tech Stack, Architecture & ERD — UA Facility Management System
 
+> **NOTE:** Status vocabulary has been normalized. What used to be called **"booked"** in older code and data is now consistently called **"reserved"** for active reservations. A background normalization step and migration ensure legacy `booked` rows are mapped to `reserved`, and past reservations auto‑transition to `completed` after `end_time`.
+>
+> - Active reservation statuses: `reserved`, `rescheduled`
+> - Historical statuses: `completed`, `cancelled`
+> - Form submission statuses: `pending`, `approved`, `reserved`, `disapproved`, `cancelled`
+>
+> Old references to `booked` in code, UI or data should be considered deprecated and are being phased out in favor of `reserved`.
+
 ---
 
 ## Table of Contents

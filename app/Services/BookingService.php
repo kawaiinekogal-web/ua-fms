@@ -69,7 +69,7 @@ class BookingService
             'end_time'           => $endDateTime,
             'requester_type'     => $submission->requester_type,
             'requester_unit'     => $submission->requester_unit,
-            'status'             => 'booked',
+            'status'             => 'reserved',
             'request_method'     => 'online_form',
             'purpose'            => $payload['purpose'] ?? null,
             'additional_details' => [
@@ -126,7 +126,7 @@ class BookingService
             'end_time'           => $endDateTime,
             'requester_type'     => 'admin',
             'requester_unit'     => 'GSU Office',
-            'status'             => 'booked',
+            'status'             => 'reserved',
             'request_method'     => 'direct_admin',
             'purpose'            => $data['purpose'],
             'additional_details' => [
@@ -146,7 +146,7 @@ class BookingService
             'requester_id'   => $adminId,
             'requester_type' => 'admin',
             'requester_unit' => 'GSU Office',
-            'status'         => 'booked',
+            'status'         => 'reserved',
             'payload'        => [
                 'control_no'      => 'BKG-' . now()->format('YmdHis') . '-' . head($facilityIds),
                 'date_request'    => now()->toDateString(),

@@ -20,16 +20,47 @@ class FormSubmissionController extends Controller
     ) {}
 
     /**
-     * List facilities utilization form submissions.
+     * List facilities utilization form submissions with filtering and search.
      */
-    public function index()
+    public function index(Request $request)
     {
-        $submissions = FormSubmission::with('requester')
-            ->where('type', 'facilities_utilization')
+        $query = FormSubmission::with('requester')
+            ->where('type', 'facilities_utilization');
+
+        // Filter by status
+        if ($request->filled('status')) {
+            $query->where('status', $request->input('status'));
+        }
+
+        // Filter by facility
+        if ($request->filled('facility_id')) {
+            $facilityId = $request->input('facility_id');
+            $query->whereJsonContains('payload->facility_id', (int) $facilityId);
+        }
+
+        // Filter by month (date_activity is stored as YYYY-MM-DD in payload)
+        if ($request->filled('month')) {
+            $month = $request->input('month'); // format: YYYY-MM
+            $query->whereRaw('JSON_EXTRACT(payload, \'$.date_activity\') LIKE ?', [$month . '%']);
+        }
+
+        // Search by control number
+        if ($request->filled('search')) {
+            $search = $request->input('search');
+            $query->whereRaw('JSON_EXTRACT(payload, \'$.control_no\') LIKE ?', ['%' . $search . '%']);
+        }
+
+        // Sort: control number A-Z (pending requests first without control no), then by date
+        $submissions = $query->orderByRaw('CASE WHEN JSON_EXTRACT(payload, \'$.control_no\') IS NULL THEN 1 ELSE 0 END DESC, JSON_EXTRACT(payload, \'$.control_no\') ASC')
             ->orderByDesc('created_at')
             ->paginate(15);
 
-        return view('admin.forms.facilities_index', compact('submissions'));
+        // Get available facilities for filter dropdown
+        $facilities = Facility::where('is_active', true)
+            ->orderBy('name')
+            ->get();
+
+        return view('admin.forms.facilities_index', compact('submissions', 'facilities'));
     }
 
     /**
@@ -105,21 +136,21 @@ class FormSubmissionController extends Controller
     }
 
     /**
-     * Convert an approved facilities form into a Booking.
+     * Convert an approved facilities form into a Reservation.
      *
      * This enforces:
      * - Only approved submissions are allowed.
      * - Facility must not be unavailable/maintenance.
-     * - No overlapping approved bookings for the same facility & time.
+     * - No overlapping reserved bookings for the same facility & time.
      */
-    public function setBooking(FormSubmission $submission)
+    public function setReservation(FormSubmission $submission)
     {
         if ($submission->type !== 'facilities_utilization') {
             abort(404);
         }
 
         if ($submission->status !== 'approved') {
-            return back()->withErrors(['status' => 'Only approved requests can be converted to bookings.']);
+            return back()->withErrors(['status' => 'Only approved requests can be converted to reservations.']);
         }
 
         $result = $this->bookingService->createFromSubmission($submission);
@@ -131,7 +162,7 @@ class FormSubmissionController extends Controller
         $booking = $result;
 
         return redirect()->route('admin.forms.facilities.index')
-            ->with('status', "Booking created (Code: {$booking->booking_code}) and request marked as booked.");
+            ->with('status', "Reservation created (Code: {$booking->booking_code}) and request marked as reserved.");
     }
 
 }

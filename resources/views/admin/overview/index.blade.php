@@ -14,7 +14,7 @@
         <div>
             <h1 class="fms-page-title">Monthly Overview</h1>
             <p class="text-xs text-neutral-600">
-Number of approved/rescheduled bookings this month per facility
+Number of reserved/rescheduled reservations this month per facility
                 (custom college / org facilities are grouped under "OTHERS").
             </p>
         </div>

@@ -32,13 +32,16 @@ class FormController extends Controller
             ->orderBy('name')
             ->get();
 
+        // Filter signatories by the user's organization
         $presidents = Signatory::where('type', 'org_president')
             ->where('is_active', true)
+            ->where('unit', $user->organization_name)
             ->orderBy('name')
             ->get();
 
         $advisers = Signatory::where('type', 'org_adviser')
             ->where('is_active', true)
+            ->where('unit', $user->organization_name)
             ->orderBy('name')
             ->get();
 
@@ -47,7 +50,7 @@ class FormController extends Controller
             'user',
             'presidents',
             'advisers'
-        ));
+        ));;
 
     }
 
@@ -114,11 +117,38 @@ class FormController extends Controller
     }
 
     /**
-     * List the current org staff member's requests.
+     * List the current org staff member's requests, with filters.
      */
-    public function indexFacilities()
+    public function indexFacilities(Request $request)
     {
-        $submissions = $this->handleIndexFacilities();
+        $user = Auth::user();
+        $query = FormSubmission::with('requester')
+            ->where('type', 'facilities_utilization')
+            ->where('requester_id', $user->id)
+            ->where('status', '!=', 'reserved');
+
+        // Filter: control number (payload->control_no)
+        if ($search = request('search')) {
+            $query->whereRaw("JSON_EXTRACT(payload, '$.control_no') LIKE ?", ['%'.$search.'%']);
+        }
+
+        // Filter: status
+        if ($status = request('status')) {
+            $query->where('status', $status);
+        }
+
+        // Filter: activity date (payload->date_activity)
+        if ($activityDate = request('activity_date')) {
+            $query->whereRaw("JSON_EXTRACT(payload, '$.date_activity') = ?", [$activityDate]);
+        }
+
+        // Order: control_no first (non-null), then created_at desc
+        $submissions = $query
+            ->orderByRaw("CASE WHEN JSON_EXTRACT(payload, '$.control_no') IS NULL THEN 1 ELSE 0 END ASC")
+            ->orderByRaw("JSON_EXTRACT(payload, '$.control_no') ASC")
+            ->orderByDesc('created_at')
+            ->paginate(15)
+            ->appends(request()->query());
 
         return view('org.requests.facilities_index', compact('submissions'));
     }
@@ -145,5 +175,32 @@ class FormController extends Controller
         }
 
         return view('org.requests.facilities_show', compact('submission', 'payload', 'facilities'));
+    }
+
+    /**
+     * Cancel a pending facilities utilization request (org side).
+     */
+    public function cancelFacilities(FormSubmission $submission)
+    {
+        $user = Auth::user();
+
+        if (
+            $submission->type !== 'facilities_utilization' ||
+            $submission->requester_id !== $user->id
+        ) {
+            abort(404);
+        }
+
+        if ($submission->status !== 'pending') {
+            return back()->withErrors([
+                'status' => 'Only pending requests can be cancelled.',
+            ]);
+        }
+
+        $submission->markCancelled();
+
+        return redirect()
+            ->route('org.requests.facilities.index')
+            ->with('status', 'Request cancelled.');
     }
 }

@@ -45,6 +45,13 @@ class Booking extends Model
         $this->additional_details = $details;
     }
 
+    public function markCompleted(): void
+    {
+        if ($this->end_time && $this->end_time->isPast()) {
+            $this->status = 'completed';
+        }
+    }
+
     public function markCancelled(string $reason, string $cancelledBy): void
     {
         $details = $this->additional_details ?? [];
@@ -62,7 +69,7 @@ class Booking extends Model
         return $query->whereHas('facilities', function ($q) use ($facilityIds) {
             $q->whereIn('facility_id', $facilityIds);
         })
-            ->where('status', 'approved')
+            ->where('status', 'reserved')
             ->where(function ($q) use ($startTime, $endTime) {
                 $q->whereBetween('start_time', [$startTime, $endTime])
                   ->orWhereBetween('end_time', [$startTime, $endTime])
@@ -86,5 +93,17 @@ class Booking extends Model
     public function maintenanceTickets()
     {
         return $this->hasMany(MaintenanceTicket::class);
+    }
+
+    public function scopeMarkCompleted($query)
+    {
+        return $query->where('status', 'reserved')
+            ->where('end_time', '<', now())
+            ->update(['status' => 'completed']);
+    }
+
+    public function scopeCompleted($query)
+    {
+        return $query->where('status', 'completed');
     }
 }

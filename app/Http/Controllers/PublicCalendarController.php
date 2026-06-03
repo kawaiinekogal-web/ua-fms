@@ -19,9 +19,7 @@ class PublicCalendarController extends Controller
 
        $bookings = Booking::with('facilities')
             ->whereBetween('start_time', [$start, $end])
-            ->whereIn('status', ['booked', 'rescheduled'])
-            ->orderBy('start_time')
-            ->get();
+            ->whereIn('status', ['reserved', 'rescheduled'])
 
         $days = $this->groupByDay($bookings);
 
@@ -41,7 +39,7 @@ class PublicCalendarController extends Controller
             ->orderBy('name')
             ->get();
 
- return view('public.calendar', [
+        return view('welcome', [
             'currentMonth'          => $current,
             'days'                  => $days,
             'unavailableFacilities' => $unavailableFacilities,

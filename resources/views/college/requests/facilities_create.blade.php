@@ -52,8 +52,17 @@
                 {{-- 2. SAFELY check for Core Facilities --}}
                 @if(!empty($coreFacilities))
                     @foreach($coreFacilities as $facility)
-                        <option value="{{ $facility->id }}" {{ old('facility_id') == $facility->id ? 'selected' : '' }}>
-                            {{ $facility->name }}
+                        @php
+                            $isUnavailable = in_array($facility->availability_status, ['unavailable', 'maintenance'], true);
+                            $statusLabel = $facility->availability_status === 'maintenance' ? 'Under Maintenance' : 'Unavailable';
+                        @endphp
+                        <option
+                            value="{{ $facility->id }}"
+                            {{ old('facility_id') == $facility->id ? 'selected' : '' }}
+                            {{ $isUnavailable ? 'disabled' : '' }}
+                            style="{{ $isUnavailable ? 'color:#9CA3AF;' : '' }}"
+                        >
+                            {{ $facility->name }}{{ $isUnavailable ? ' (' . $statusLabel . ')' : '' }}
                         </option>
                     @endforeach
                 @endif

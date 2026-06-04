@@ -109,7 +109,6 @@ class FormSubmissionController extends Controller
             $this->notifications->notifyFormApproved($submission->requester_id, $submission->id);
         }
 
-
         return redirect()->route('admin.forms.facilities.index')
             ->with('status', 'Request approved. Requester must proceed to GSU office to sign and finalize the form.');
     }

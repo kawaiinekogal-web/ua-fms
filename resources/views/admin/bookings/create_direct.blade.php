@@ -75,11 +75,17 @@
                 required
             >
                 @foreach($facilities as $facility)
+                    @php
+                        $isUnavailable = in_array($facility->availability_status, ['unavailable', 'maintenance'], true);
+                        $statusLabel = $facility->availability_status === 'maintenance' ? 'Under Maintenance' : 'Unavailable';
+                    @endphp
                     <option
                         value="{{ $facility->id }}"
                         {{ in_array($facility->id, old('facility_ids', [])) ? 'selected' : '' }}
+                        {{ $isUnavailable ? 'disabled' : '' }}
+                        style="{{ $isUnavailable ? 'color:#9CA3AF;' : '' }}"
                     >
-                        {{ $facility->name }} ({{ $facility->location }})
+                        {{ $facility->name }} ({{ $facility->location }}){{ $isUnavailable ? ' — ' . $statusLabel : '' }}
                     </option>
                 @endforeach
             </select>

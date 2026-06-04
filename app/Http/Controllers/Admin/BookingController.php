@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
+use App\Http\Controllers\Traits\GroupsBookingsByDay;
 use App\Models\Booking;
 use App\Models\Facility;
 use App\Models\Notification;
@@ -12,6 +13,7 @@ use Carbon\Carbon;
 
 class BookingController extends Controller
 {
+    use GroupsBookingsByDay;
     public function __construct(
         protected BookingService $bookingService,
         protected \App\Services\NotificationService $notificationService
@@ -20,7 +22,7 @@ class BookingController extends Controller
     public function index(Request $request)
     {
         $query = Booking::with(['requester', 'facilities'])
-            ->whereIn('status', ['reserved', 'rescheduled', 'cancelled', 'completed']);
+            ->whereIn('status', ['reserved', 'rescheduled', 'cancelled', 'completed', 'pending']);
 
         // Filter by status
         if ($request->filled('status')) {
@@ -124,25 +126,12 @@ class BookingController extends Controller
         $end   = $current->copy()->endOfMonth();
 
         $bookings = Booking::with(['facilities', 'requester'])
-            ->where(function ($query) use ($start, $end) {
-                $query->whereBetween('start_time', [$start, $end])
-                    ->orWhere(function ($query) use ($start, $end) {
-                        $query->where('start_time', '<', $start)
-                            ->where('end_time', '>', $start);
-                    });
-            })
+            ->whereBetween('start_time', [$start, $end])
             ->whereIn('status', ['reserved', 'rescheduled'])
             ->orderBy('start_time')
             ->get();
 
-        $days = [];
-        foreach ($bookings as $booking) {
-            $dayKey = $booking->start_time->toDateString();
-            if (!isset($days[$dayKey])) {
-                $days[$dayKey] = [];
-            }
-            $days[$dayKey][] = $booking;
-        }
+        $days = $this->groupByDay($bookings);
 
         // Optional: daily detail when ?day=DD is present
         $selectedDate = null;

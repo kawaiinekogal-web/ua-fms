@@ -69,52 +69,33 @@ class BookingController extends Controller
 
     public function calendar(Request $request)
     {
-        $user = Auth::user();
-
-        $collegeId = $user->college_id;
-        $collegeName = $user->college_name;
-
         $current = $this->resolveMonth($request);
         $start = $current->copy()->startOfMonth();
         $end = $current->copy()->endOfMonth();
 
-        $collegeFacilityIds = Facility::where('owner_type', 'college')
-            ->ownedByCollege($collegeId, $collegeName)
-            ->pluck('id')
-            ->all();
-
+        // Calendar shows all reserved/rescheduled reservations (same as public/admin/org)
         $bookings = Booking::with('facilities')
             ->whereBetween('start_time', [$start, $end])
-            ->where(function ($query) use ($user, $collegeFacilityIds) {
-                $query->where('requester_id', $user->id);
-
-                if (!empty($collegeFacilityIds)) {
-                    $query->orWhereHas('facilities', function ($q) use ($collegeFacilityIds) {
-                        $q->whereIn('facility_id', $collegeFacilityIds);
-                    });
-                }
-            })
+            ->whereIn('status', ['reserved', 'rescheduled'])
             ->orderBy('start_time')
             ->get();
 
-
         $days = $this->groupByDay($bookings);
 
-
         $selectedDate = null;
-
         $selectedDateBookings = collect();
+
         if ($request->filled('day')) {
             $dayInt = (int) $request->query('day');
             if ($dayInt >= 1 && $dayInt <= $current->daysInMonth) {
                 $selectedDate = $current->copy()->day($dayInt);
                 $key = $selectedDate->toDateString();
                 $selectedDateBookings = collect($days[$key] ?? [])->sortBy('start_time');
-
             }
         }
 
-       $facilityCounts = Facility::whereIn('id', $collegeFacilityIds)
+        // Facility counts for the overview table (all active facilities)
+        $facilityCounts = Facility::where('is_active', true)
             ->orderBy('name')
             ->get()
             ->map(function ($facility) use ($start, $end) {
@@ -125,16 +106,15 @@ class BookingController extends Controller
 
                 return [
                     'facility' => $facility,
-                    'count' => $count,
+                    'count'    => $count,
                 ];
             });
 
         return view('college.bookings.calendar', [
-
             'currentMonth'         => $current,
             'days'                 => $days,
             'facilityCounts'       => $facilityCounts,
-            'collegeName'          => $collegeName,
+            'collegeName'          => Auth::user()->college_name ?? '',
             'selectedDate'         => $selectedDate,
             'selectedDateBookings' => $selectedDateBookings,
         ]);

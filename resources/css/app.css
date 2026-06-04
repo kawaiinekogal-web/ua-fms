@@ -749,7 +749,7 @@
 :root{
   --primary:#111111;
   --primary-dark:#000000;
-  --primary-light:#F2F2F2;
+  --primary-light:#E0E0E0;
   --bg:#ffffff;
   --bg2:#FAFAFA;
   --bg3:#F5F5F5;
@@ -792,13 +792,11 @@
 .auth-bar{background:var(--bg2);border-bottom:1px solid var(--border2);padding:8px 48px;display:flex;align-items:center;justify-content:space-between;font-size:12px;color:var(--text)}
 .auth-bar a{color:var(--primary);font-weight:600;margin-left:12px;text-decoration:underline}
 
-/* ── HERO CAROUSEL (Matches Image 3 Structure) ── */
-.hero-carousel{position:relative;width:100%;height:460px;background:#000;overflow:hidden;border-bottom:1px solid var(--border2)}
-.slide{position:absolute;top:0;left:0;width:100%;height:100%;background-size:cover;background-position:center;opacity:0;transition:opacity 1.2s ease-in-out;filter:grayscale(100%)}
-.slide.active{opacity:0.65}
-.hero-overlay{position:absolute;bottom:0;left:0;width:100%;padding:120px 48px 40px;background:linear-gradient(to top, rgba(0,0,0,0.9) 0%, rgba(0,0,0,0) 100%);display:flex;flex-direction:column;pointer-events:none}
-.hero-overlay h2{font-family:var(--display);color:#fff;font-size:36px;font-weight:400;line-height:1.1;margin-bottom:6px}
-.hero-overlay p{color:#ccc;font-size:15px;letter-spacing:0.5px}
+/* ── HERO SECTION (Static, No Carousel) ── */
+.hero-section{position:relative;width:100%;height:320px;background:#fff;display:flex;align-items:center;justify-content:center;border-bottom:1px solid var(--border2);padding:0 48px}
+.hero-content{text-align:center;max-width:640px}
+.hero-content h1{font-family:var(--display);color:var(--primary);font-size:42px;font-weight:400;line-height:1.2;margin-bottom:12px}
+.hero-content p{color:var(--text2);font-size:16px;line-height:1.6}
 
 /* ── FEATURES ── */
 .section{padding:60px 48px;max-width:1040px;margin:0 auto}
@@ -1072,16 +1070,16 @@
 .cal-grid-head{display:grid;grid-template-columns:repeat(7,1fr);padding:10px 16px 6px}
 .cal-dh{font-size:10px;font-weight:600;color:var(--text3);text-align:center;text-transform:uppercase;letter-spacing:.5px}
 .cal-days{display:grid;grid-template-columns:repeat(7,1fr);gap:3px;padding:6px 12px 14px}
-.cal-day{aspect-ratio:1;display:flex;align-items:center;justify-content:center;font-size:13px;border-radius:50%;cursor:default;color:var(--text2);transition:all .15s;position:relative}
-.cal-day.other{color:var(--border)}
-.cal-day.has-event{background:var(--primary-light);color:var(--primary);font-weight:600;cursor:pointer}
-.cal-day.has-event:hover{background:#E6E6E6}
-.cal-day.today{background:var(--primary);color:#fff;font-weight:600}
-.cal-day.today.has-event{background:var(--primary);color:#fff}
+.cal-day{aspect-ratio:1;display:flex;align-items:center;justify-content:center;font-size:13px;border-radius:50%;cursor:default;color:#4D4D4D;transition:all .15s;position:relative}
+.cal-day.other{color:#CCCCCC}
+.cal-day.has-event{background:#E0E0E0;color:#111111;font-weight:600;cursor:pointer}
+.cal-day.has-event:hover{background:#CACACA}
+.cal-day.today{background:#111111;color:#fff;font-weight:600}
+.cal-day.today.has-event{background:#111111;color:#fff}
 
 .cal-day.today:hover,
-.cal-day.today.has-event:hover{background:var(--primary-dark);color:#fff}
-.cal-day.has-event::after{content:'';position:absolute;bottom:3px;left:50%;transform:translateX(-50%);width:4px;height:4px;border-radius:50%;background:var(--primary)}
+.cal-day.today.has-event:hover{background:#000000;color:#fff}
+.cal-day.has-event::after{content:'';position:absolute;bottom:3px;left:50%;transform:translateX(-50%);width:4px;height:4px;border-radius:50%;background:#111111}
 .cal-day.today::after{background:#fff}
 
 /* ── EVENTS SIDEBAR ── */

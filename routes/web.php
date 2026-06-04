@@ -18,7 +18,7 @@ use App\Http\Controllers\PublicCalendarController;
 // Authentication routes (simple web login)
 Route::get('/login', [AuthController::class, 'showLogin'])->name('login');
 Route::post('/login', [AuthController::class, 'login'])->name('login.post');
-Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
+Route::match(['GET','POST'], '/logout', [AuthController::class, 'logout'])->name('logout');
 
 // Notifications (for all authenticated users)
 Route::middleware(['auth'])->group(function () {

@@ -12,7 +12,7 @@
 :root{
   --primary:#111111;
   --primary-dark:#000000;
-  --primary-light:#F2F2F2;
+  --primary-light:#E0E0E0;
   --bg:#ffffff;
   --bg2:#FAFAFA;
   --bg3:#F5F5F5;
@@ -59,11 +59,17 @@ input,select,textarea,button{font-family:inherit}
 .auth-bar{background:var(--bg2);border-bottom:1px solid var(--border2);padding:8px 48px;display:flex;align-items:center;justify-content:space-between;font-size:12px;color:var(--text)}
 .auth-bar a{color:var(--primary);font-weight:600;margin-left:12px;text-decoration:underline}
 
-/* ── HERO CAROUSEL (Matches Image 3 Structure) ── */
-.hero-carousel{position:relative;width:100%;height:460px;background:#000;overflow:hidden;border-bottom:1px solid var(--border2)}
-.slide{position:absolute;top:0;left:0;width:100%;height:100%;background-size:cover;background-position:center;opacity:0;transition:opacity 1.2s ease-in-out;filter:grayscale(100%)}
-.slide.active{opacity:0.65}
-.hero-overlay{position:absolute;bottom:0;left:0;width:100%;padding:120px 48px 40px;background:linear-gradient(to top, rgba(0,0,0,0.9) 0%, rgba(0,0,0,0) 100%);display:flex;flex-direction:column;pointer-events:none}
+/* ── HERO SECTION (Static, No Carousel) ── */
+.hero-section{position:relative;width:100%;height:320px;background:#fff;display:flex;align-items:center;justify-content:center;border-bottom:1px solid var(--border2);padding:0 48px}
+.hero-content{text-align:center;max-width:640px}
+.hero-content h1{font-family:var(--display);color:var(--primary);font-size:42px;font-weight:400;line-height:1.2;margin-bottom:12px}
+.hero-content p{color:var(--text2);font-size:16px;line-height:1.6}
+
+/* ── HERO CAROUSEL (White Background, Black Text) ── */
+.hero-carousel{position:relative;width:100%;height:460px;background:#fff;overflow:hidden;border-bottom:1px solid var(--border2)}
+.slide{position:absolute;top:0;left:0;width:100%;height:100%;background-size:cover;background-position:center;opacity:0;filter:grayscale(100%)}
+.slide.active{opacity:1}
+.hero-overlay{position:absolute;bottom:0;left:0;width:100%;padding:120px 48px 40px;background:linear-gradient(to top, rgba(0,0,0,0.65) 0%, rgba(0,0,0,0) 100%);display:flex;flex-direction:column;pointer-events:none}
 .hero-overlay h2{font-family:var(--display);color:#fff;font-size:36px;font-weight:400;line-height:1.1;margin-bottom:6px}
 .hero-overlay p{color:#ccc;font-size:15px;letter-spacing:0.5px}
 
@@ -351,7 +357,6 @@ input,select,textarea,button{font-family:inherit}
   <div class="slide" style="background-image: url('{{ asset('img/facilities/grand-stand.jpg') }}')"></div>
   <div class="slide" style="background-image: url('{{ asset('img/facilities/paghiusa-hall.jpg') }}')"></div>
 
-
   <div class="hero-overlay">
     <div style="max-width: 1040px; margin: 0 auto;">
       <h2>University of Antique</h2>
@@ -359,6 +364,19 @@ input,select,textarea,button{font-family:inherit}
     </div>
   </div>
 </div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+  const slides = document.querySelectorAll('.hero-carousel .slide');
+  let currentSlide = 0;
+
+  setInterval(() => {
+    slides[currentSlide].classList.remove('active');
+    currentSlide = (currentSlide + 1) % slides.length;
+    slides[currentSlide].classList.add('active');
+  }, 4000); // Change slide every 4 seconds
+});
+</script>
 
 <div class="ua-portal-section" id="about">
   <div class="ua-portal-grid">
@@ -469,4 +487,25 @@ input,select,textarea,button{font-family:inherit}
   </div>
 
 </div>
+
+<script>
+  document.addEventListener('DOMContentLoaded', function () {
+    const slides = document.querySelectorAll('.hero-carousel .slide');
+    let current = 0;
+
+    if (!slides.length) return;
+
+    // Ensure only the first slide is active initially
+    slides.forEach((s, i) => s.classList.toggle('active', i === 0));
+
+    if (slides.length === 1) return; // nothing to rotate
+
+    setInterval(() => {
+      slides[current].classList.remove('active');
+      current = (current + 1) % slides.length;
+      slides[current].classList.add('active');
+    }, 5000); // 5 seconds
+  });
+</script>
+
 @endsection

@@ -3,7 +3,14 @@
 @section('content')
     <div class="fms-card">
         <div class="fms-page-header">
-            <h1 class="fms-page-title">Notifications</h1>
+            <div>
+                <h1 class="fms-page-title">Notifications</h1>
+            </div>
+            <div>
+                <a href="{{ url()->previous() }}" class="fms-btn-secondary">
+                    ← Back
+                </a>
+            </div>
         </div>
 
         @if($notifications->count())

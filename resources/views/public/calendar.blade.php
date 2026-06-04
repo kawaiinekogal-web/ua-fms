@@ -4,6 +4,7 @@
 {{-- CALENDAR SECTION (partial: no layout, no html/head/body, no @extends) --}}
 @php
     $baseRoute = $calendarRoute ?? 'home';
+    $today     = \Carbon\Carbon::now(); // uses app timezone (Asia/Manila)
 @endphp
 
 <div class="calendar-wrapper" id="calendar">
@@ -43,7 +44,6 @@
             $endOfMonth    = $currentMonth->copy()->endOfMonth();
             $startOfCal    = $startOfMonth->copy()->startOfWeek(0);
             $endOfCal      = $endOfMonth->copy()->endOfWeek(6);
-            $today         = \Carbon\Carbon::today();
             $cursor        = $startOfCal->copy();
           @endphp
           @while($cursor->lte($endOfCal))
@@ -57,7 +57,7 @@
               if($isToday)   $classes .= ' today';
               if($hasEvents && !$isOther) $classes .= ' has-event';
             @endphp
-            <div class="cal-day" @if($hasEvents && !$isOther) title="{{ count($days[$dateKey]) }} reservation(s)" @endif>
+            <div class="{{ $classes }}" @if($hasEvents && !$isOther) title="{{ count($days[$dateKey]) }} reservation(s)" @endif>
               {{ $cursor->day }}
             </div>
             @php $cursor->addDay() @endphp

@@ -113,7 +113,8 @@ class FormController extends Controller
 
     protected function submittedRedirectRoute(): string
     {
-        return 'org.dashboard';
+        // After submitting a facilities request, go back to "My requests"
+        return 'org.requests.facilities.index';
     }
 
     /**

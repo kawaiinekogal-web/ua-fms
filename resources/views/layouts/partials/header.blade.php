@@ -14,7 +14,17 @@
         </nav>
         <div class="nav-actions">
             @auth
-                <a href="{{ route('admin.dashboard') }}" class="btn-ghost">Dashboard</a>
+                @php
+                    $user = auth()->user();
+                    $dashRoute = $user->isAdmin()
+                        ? 'admin.dashboard'
+                        : ($user->isCollegeStaff()
+                            ? 'college.dashboard'
+                            : ($user->isOrgStaff()
+                                ? 'org.dashboard'
+                                : 'home'));
+                @endphp
+                <a href="{{ route($dashRoute) }}" class="btn-ghost">Dashboard</a>
                 <form method="POST" action="{{ route('logout') }}" style="display:inline;">
                     @csrf
                     <button type="submit" class="btn-solid">Sign out</button>

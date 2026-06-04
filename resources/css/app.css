@@ -1083,10 +1083,12 @@
 .cal-day.today::after{background:#fff}
 
 /* ── EVENTS SIDEBAR ── */
-.events-card{background:#fff;border:1px solid var(--border2);border-radius:var(--r-xl);overflow:hidden;box-shadow:var(--shadow-xs)}
-.events-header{padding:14px 18px;border-bottom:1px solid var(--border2)}
-.events-header h4{font-size:13px;font-weight:600}
-.events-list{padding:12px 16px;display:flex;flex-direction:column;gap:10px}
+.events-col{display:flex;flex-direction:column;gap:16px}
+.events-card{background:#ffffff;border:1px solid var(--border2);border-radius:var(--r-xl);overflow:hidden;box-shadow:var(--shadow-xs)}
+.events-card-current{margin-bottom:12px}
+.events-header{padding:14px 18px;border-bottom:1px solid var(--border2);background:#fff}
+.events-header h4{font-size:13px;font-weight:600;color:var(--text)}
+.events-list{padding:12px 16px 20px;display:flex;flex-direction:column;gap:10px}
 .event-row{display:flex;gap:10px;align-items:flex-start;padding-bottom:10px;border-bottom:1px solid var(--border2)}
 .event-row:last-child{border-bottom:none;padding-bottom:0}
 .event-date-badge{background:var(--primary-light);color:var(--primary);font-size:11px;font-weight:600;padding:3px 8px;border-radius:var(--r-sm);white-space:nowrap;min-width:32px;text-align:center;flex-shrink:0;margin-top:1px}

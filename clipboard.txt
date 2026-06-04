@@ -557,7 +557,7 @@ input,select,textarea,button{font-family:inherit}
 <div class="calendar-wrapper" id="calendar-view">
   <div class="cal-inner">
     <div class="section-head">
-      <h2>Reservation Booking Schedule</h2>
+      <h2>Reservation Schedule</h2>
       <p>Public calendar of approved and scheduled facility reservations. All times are in Philippine Standard Time.</p>
     </div>
 

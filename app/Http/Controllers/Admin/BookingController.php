@@ -20,7 +20,7 @@ class BookingController extends Controller
     public function index(Request $request)
     {
         $query = Booking::with(['requester', 'facilities'])
-            ->whereIn('status', ['booked', 'rescheduled', 'cancelled', 'completed']);
+            ->whereIn('status', ['reserved', 'rescheduled', 'cancelled', 'completed']);
 
         // Filter by status
         if ($request->filled('status')) {
@@ -98,7 +98,7 @@ class BookingController extends Controller
         $booking = $this->bookingService->createDirectBooking($data, auth()->id());
 
         return redirect()->route('admin.bookings.index')
-            ->with('status', "High-priority booking created ({$booking->booking_code}). Conflicting bookings have been set to 'Pending'.");
+            ->with('status', "High-priority reservation created ({$booking->booking_code}). Conflicting reservations have been moved back to Pending and requesters notified.");
     }
 
     public function edit(Booking $booking)

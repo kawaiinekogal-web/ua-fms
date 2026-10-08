@@ -128,8 +128,8 @@
             </form>
         @endif
 
-        @if(in_array($submission->status, ['approved','reserved'], true))
-            {{-- Generate PDF for the approved/reserved request --}}
+        @if($submission->status === 'reserved')
+            {{-- Generate PDF once the request has been converted to a reservation --}}
             <form method="GET" action="{{ route('admin.forms.facilities.pdf', $submission) }}">
                 <button type="submit" class="px-4 py-2 bg-gray-700 text-white rounded hover:bg-gray-800 text-sm">
                     Generate PDF

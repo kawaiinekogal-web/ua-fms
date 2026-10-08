@@ -1,4 +1,4 @@
-and just   @extends('layouts.admin')
+ @extends('layouts.admin')
 
 @section('admin-content')
 <div class="fms-card">

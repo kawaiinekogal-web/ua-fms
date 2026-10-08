@@ -31,6 +31,11 @@
                         'routes' => 'admin.forms.facilities.*',
                     ],
                     [
+                        'label'  => 'Repair & maintenance',
+                        'route'  => 'admin.maintenance-tickets.index',
+                        'routes' => 'admin.maintenance-tickets.*',
+                    ],
+                    [
                         'label'  => 'Reservations',
                         'route'  => 'admin.bookings.index',
                         'routes' => ['admin.bookings.index'],

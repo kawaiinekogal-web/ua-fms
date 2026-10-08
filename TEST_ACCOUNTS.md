@@ -31,9 +31,9 @@ It now creates the following accounts:
 - `adminC@example.com` / `password123`
 
 ### College staff
-- `collegeA@example.com` / `password123` → `college_name = "College A"`
-- `collegeB@example.com` / `password123` → `college_name = "College B"`
-- `collegeC@example.com` / `password123` → `college_name = "College C"`
+- `college@ccis.com` / `password123` → `college_name = "CCIS"`
+- `college@cea.com` / `password123` → `college_name = "CEA"`
+- `college@cmg.com` / `password123` → `college_name = "CMG"`
 
 ### Org staff
 - `orgA@example.com` / `password123` → `organization_name = "Org A"`

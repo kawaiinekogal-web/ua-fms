@@ -109,6 +109,14 @@
                                 <a href="{{ route('admin.bookings.edit', $booking) }}" class="fms-link">
                                     View / Modify
                                 </a>
+                                @php
+                                    $submissionId = $booking->additional_details['form_submission_id'] ?? null;
+                                @endphp
+                                @if($submissionId)
+                                    <a href="{{ route('admin.forms.facilities.pdf', $submissionId) }}" class="fms-btn fms-btn-secondary ml-3" style="font-size:12px;padding:4px 10px;">
+                                        Generate PDF
+                                    </a>
+                                @endif
                             </td>
                         </tr>
                     @endforeach

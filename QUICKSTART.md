@@ -26,9 +26,21 @@ composer install
 php artisan key:generate
 ```
 
-### 1.4 Set Up Database (SQLite for development)
+### 1.4 Set Up MariaDB
+
+Create the `facility_management` database in MariaDB, then set the connection values in `.env`:
+
+```env
+DB_CONNECTION=mysql
+DB_HOST=127.0.0.1
+DB_PORT=3306
+DB_DATABASE=facility_management
+DB_USERNAME=your_database_user
+DB_PASSWORD=your_database_password
+```
+
+Run the migrations:
 ```bash
-type nul > database/database.sqlite
 php artisan migrate
 ```
 
@@ -154,10 +166,8 @@ php -v  # Should be 8.1 or higher
 
 ### Database errors:
 ```bash
-del database\database.sqlite
-type nul > database\database.sqlite
+php artisan config:clear
 php artisan migrate
-php artisan db:seed
 ```
 
 ### Launcher can't connect:

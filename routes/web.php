@@ -48,6 +48,13 @@ Route::get('/healthz', function () {
 Route::middleware(['auth', 'role:admin'])->group(function () {
     Route::get('/admin/dashboard', [AdminDashboardController::class, 'index'])->name('admin.dashboard');
 
+    Route::get('/admin/maintenance-tickets', [\App\Http\Controllers\Admin\MaintenanceTicketController::class, 'index'])
+        ->name('admin.maintenance-tickets.index');
+    Route::get('/admin/maintenance-tickets/{ticket}', [\App\Http\Controllers\Admin\MaintenanceTicketController::class, 'show'])
+        ->name('admin.maintenance-tickets.show');
+    Route::put('/admin/maintenance-tickets/{ticket}', [\App\Http\Controllers\Admin\MaintenanceTicketController::class, 'update'])
+        ->name('admin.maintenance-tickets.update');
+
     // Facilities
     Route::get('/admin/facilities', [AdminFacilityController::class, 'index'])->name('admin.facilities.index');
     Route::get('/admin/facilities/create', [AdminFacilityController::class, 'create'])->name('admin.facilities.create');
@@ -110,6 +117,15 @@ Route::middleware(['auth', 'role:admin'])->group(function () {
 // College Staff
 Route::middleware(['auth', 'role:college_staff'])->group(function () {
     Route::get('/college/dashboard', [CollegeDashboardController::class, 'index'])->name('college.dashboard');
+
+    Route::get('/college/maintenance-requests', [\App\Http\Controllers\College\MaintenanceTicketController::class, 'index'])
+        ->name('college.maintenance-tickets.index');
+    Route::get('/college/maintenance-requests/create', [\App\Http\Controllers\College\MaintenanceTicketController::class, 'create'])
+        ->name('college.maintenance-tickets.create');
+    Route::post('/college/maintenance-requests', [\App\Http\Controllers\College\MaintenanceTicketController::class, 'store'])
+        ->name('college.maintenance-tickets.store');
+    Route::get('/college/maintenance-requests/{ticket}', [\App\Http\Controllers\College\MaintenanceTicketController::class, 'show'])
+        ->name('college.maintenance-tickets.show');
 
     // Facilities
     Route::get('/college/facilities', [CollegeFacilityController::class, 'index'])->name('college.facilities.index');

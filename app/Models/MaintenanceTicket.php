@@ -10,10 +10,12 @@ class MaintenanceTicket extends Model
     use HasFactory;
 
     protected $fillable = [
+        'ticket_code',
         'facility_id',
         'requester_id',
         'booking_id',
         'request_method',
+        'subject',
         'status',
         'issue_description',
         'admin_remarks',

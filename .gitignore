@@ -13,6 +13,7 @@
 /.zed
 /auth.json
 /node_modules
+**/node_modules/
 /launchers/electron/node_modules
 /launchers/electron/dist-electron
 /launchers/electron/variant.json

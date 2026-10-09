@@ -53,6 +53,7 @@
                 <option value="admin" {{ old('role') === 'admin' ? 'selected' : '' }}>Admin</option>
                 <option value="college_staff" {{ old('role') === 'college_staff' ? 'selected' : '' }}>College Staff</option>
                 <option value="org_staff" {{ old('role') === 'org_staff' ? 'selected' : '' }}>Organization Staff</option>
+                <option value="guest" {{ old('role') === 'guest' ? 'selected' : '' }}>Guest (Outsider)</option>
             </select>
         </div>
 
@@ -70,6 +71,15 @@
                    value="{{ old('organization_name') }}">
         </div>
 
+        <div id="guest-field" class="hidden">
+            <label for="organization_name_guest" class="block text-sm font-medium text-gray-700">Organization Name (External)</label>
+            <input type="text" name="organization_name" id="organization_name_guest"
+                   class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3"
+                   value="{{ old('organization_name') }}"
+                   placeholder="e.g., ABC Company, XYZ Foundation">
+            <p class="mt-1 text-sm text-gray-500">Enter the external organization or company name</p>
+        </div>
+
         <div class="flex justify-end space-x-4">
             <a href="{{ route('admin.users.index') }}" class="px-4 py-2 border border-gray-300 rounded-md text-gray-700 hover:bg-gray-50">
                 Cancel
@@ -85,16 +95,24 @@
 document.getElementById('role').addEventListener('change', function() {
     const collegeField = document.getElementById('college-field');
     const orgField = document.getElementById('org-field');
-    
+    const guestField = document.getElementById('guest-field');
+
     if (this.value === 'college_staff') {
         collegeField.classList.remove('hidden');
         orgField.classList.add('hidden');
+        guestField.classList.add('hidden');
     } else if (this.value === 'org_staff') {
         collegeField.classList.add('hidden');
         orgField.classList.remove('hidden');
+        guestField.classList.add('hidden');
+    } else if (this.value === 'guest') {
+        collegeField.classList.add('hidden');
+        orgField.classList.add('hidden');
+        guestField.classList.remove('hidden');
     } else {
         collegeField.classList.add('hidden');
         orgField.classList.add('hidden');
+        guestField.classList.add('hidden');
     }
 });
 </script>

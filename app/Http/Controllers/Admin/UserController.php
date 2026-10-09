@@ -39,6 +39,10 @@ class UserController extends Controller
             $data['organization_name'] = $validated['organization_name'];
         }
 
+        if ($validated['role'] === 'guest') {
+            $data['organization_name'] = $validated['organization_name'];
+        }
+
         User::create($data);
 
         return redirect()->route('admin.users.index')

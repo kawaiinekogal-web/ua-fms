@@ -65,6 +65,11 @@ class User extends Authenticatable
         return $this->role === 'org_staff';
     }
 
+    public function isGuest(): bool
+    {
+        return $this->role === 'guest';
+    }
+
     public function bookings()
     {
         return $this->hasMany(Booking::class, 'requester_id');

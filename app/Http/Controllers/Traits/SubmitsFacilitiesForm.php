@@ -29,6 +29,12 @@ trait SubmitsFacilitiesForm
 
         $facility = Facility::findOrFail($facilityId);
 
+        // Handle payment attachment upload
+        $paymentAttachmentPath = null;
+        if ($request->hasFile('payment_attachment')) {
+            $paymentAttachmentPath = $request->file('payment_attachment')->store('payment_attachments', 'public');
+        }
+
         $payload = [
             'control_no'      => null,
             'date_request'    => now()->toDateString(),
@@ -53,13 +59,19 @@ trait SubmitsFacilitiesForm
             ],
         ];
 
+        // Determine initial status and payment_status
+        $status = $paymentAttachmentPath ? 'pending_payment' : 'pending';
+        $paymentStatus = $paymentAttachmentPath ? 'payment_uploaded' : 'not_required';
+
         $submission = FormSubmission::create([
             'type'           => 'facilities_utilization',
             'requester_id'   => $user->id,
             'requester_type' => $this->requesterType(),
             'requester_unit' => $this->requesterUnit(),
-            'status'         => 'pending',
+            'status'         => $status,
             'payload'        => $payload,
+            'payment_attachment' => $paymentAttachmentPath,
+            'payment_status' => $paymentStatus,
         ]);
 
         $notifications = app(NotificationService::class);

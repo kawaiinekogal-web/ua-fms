@@ -18,7 +18,7 @@ class NotificationController extends Controller
         return view('notifications.index', compact('notifications'));
     }
 
-    public function markAsRead(Notification $notification)
+    public function markAsRead(Request $request, Notification $notification)
     {
         $user = auth()->user();
 
@@ -31,6 +31,12 @@ class NotificationController extends Controller
             $notification->save();
         }
 
-        return back();
+        // Return JSON for AJAX requests
+        if ($request->expectsJson()) {
+            return response()->json(['success' => true]);
+        }
+
+        // Fallback for non-AJAX requests
+        return redirect()->route('notifications.index');
     }
 }

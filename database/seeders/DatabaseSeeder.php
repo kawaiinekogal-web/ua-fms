@@ -36,5 +36,8 @@ class DatabaseSeeder extends Seeder
 
         // Sample users (admins, college staff, org staff A/B/C)
         $this->call(SampleUsersSeeder::class);
+
+        // Guest users for testing
+        $this->call(GuestUserSeeder::class);
     }
 }

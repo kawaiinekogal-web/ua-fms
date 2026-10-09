@@ -14,8 +14,10 @@ class FormSubmission extends Model
         'requester_id',
         'requester_type', // 'college', 'org', 'admin'
         'requester_unit', // e.g. college_name or organization_name
-        'status',         // 'pending', 'approved', 'disapproved', 'cancelled', 'reserved'
+        'status',         // 'pending', 'approved', 'disapproved', 'cancelled', 'reserved', 'pending_payment'
         'payload',        // JSON string
+        'payment_attachment',
+        'payment_status', // 'not_required', 'pending_payment', 'payment_uploaded', 'payment_verified'
     ];
 
     protected $casts = [
@@ -72,6 +74,34 @@ class FormSubmission extends Model
     public function requester()
     {
         return $this->belongsTo(User::class, 'requester_id');
+    }
+
+    public function requiresPayment(): bool
+    {
+        return $this->payment_status !== 'not_required';
+    }
+
+    public function hasPaymentUploaded(): bool
+    {
+        return $this->payment_status === 'payment_uploaded' || $this->payment_status === 'payment_verified';
+    }
+
+    public function isPaymentVerified(): bool
+    {
+        return $this->payment_status === 'payment_verified';
+    }
+
+    public function markPendingPayment(): void
+    {
+        $this->payment_status = 'pending_payment';
+        $this->status = 'pending_payment';
+        $this->save();
+    }
+
+    public function markPaymentVerified(): void
+    {
+        $this->payment_status = 'payment_verified';
+        $this->save();
     }
 }
  

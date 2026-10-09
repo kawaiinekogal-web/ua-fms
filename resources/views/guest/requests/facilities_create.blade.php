@@ -1,7 +1,13 @@
-@extends('layouts.org')
+@extends('layouts.guest')
 
-@section('org-content')
+@section('content')
 <div class="bg-white rounded shadow p-6">
+    <div class="mb-4">
+        <a href="{{ route('guest.dashboard') }}" class="inline-flex items-center px-4 py-2 bg-gray-200 text-gray-800 rounded hover:bg-gray-300 text-sm font-medium transition">
+            ← Back to Dashboard
+        </a>
+    </div>
+
     <h1 class="text-2xl font-semibold mb-4">Facilities Utilization Request</h1>
 
     <p class="text-gray-700 mb-4">
@@ -17,8 +23,8 @@
             </ul>
         </div>
     @endif
- 
-    <form method="POST" action="{{ route('org.requests.facilities.store') }}" class="space-y-6" enctype="multipart/form-data">
+
+    <form method="POST" action="{{ route('guest.requests.facilities.store') }}" class="space-y-6" enctype="multipart/form-data">
         @csrf
 
         {{-- Date & Time --}}
@@ -26,81 +32,64 @@
             <div>
                 <label for="date_activity" class="block text-sm font-medium text-gray-700">Date of Activity</label>
                 <input type="date" name="date_activity" id="date_activity" required
-                       class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3"
+                       class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 bg-white"
                        value="{{ old('date_activity') }}">
             </div>
             <div>
                 <label for="start_time" class="block text-sm font-medium text-gray-700">Start Time</label>
                 <input type="time" name="start_time" id="start_time" required
-                       class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3"
+                       class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 bg-white"
                        value="{{ old('start_time') }}">
             </div>
             <div>
                 <label for="end_time" class="block text-sm font-medium text-gray-700">End Time</label>
                 <input type="time" name="end_time" id="end_time" required
-                       class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3"
+                       class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 bg-white"
                        value="{{ old('end_time') }}">
             </div>
         </div>
 
-        {{-- Facility --}}
+        {{-- Facility / Venue --}}
         <div>
-            <label class="block text-sm font-medium text-gray-700">Facility</label>
-            <select name="facility_id" required
-                    class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3">
-                <option value="">Select Facility</option>
-                @foreach($coreFacilities as $facility)
-                    @php
-                        $isUnavailable = in_array($facility->availability_status, ['unavailable', 'maintenance'], true);
-                        $selected = (string) old('facility_id') === (string) $facility->id;
-                    @endphp
-                    <option
-                        value="{{ $facility->id }}"
-                        {{ $selected ? 'selected' : '' }}
-                        {{ $isUnavailable ? 'disabled' : '' }}
-                        style="{{ $isUnavailable ? 'color:#9CA3AF;' : '' }}"
-                    >
-                        {{ $facility->name }}{{ $isUnavailable ? ' (Unavailable)' : '' }}
-                    </option>
-                @endforeach
-
+            <label for="facility_id" class="block text-sm font-medium text-gray-700">Venue</label>
+            <select name="facility_id" id="facility_id" required
+                    class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 bg-white">
+                <option value="">Select a facility</option>
+                @if(!empty($coreFacilities))
+                    @foreach($coreFacilities as $facility)
+                        @php
+                            $isUnavailable = in_array($facility->availability_status, ['unavailable', 'maintenance'], true);
+                            $statusLabel = $facility->availability_status === 'maintenance' ? 'Under Maintenance' : 'Unavailable';
+                        @endphp
+                        <option
+                            value="{{ $facility->id }}"
+                            {{ old('facility_id') == $facility->id ? 'selected' : '' }}
+                            {{ $isUnavailable ? 'disabled' : '' }}
+                            style="{{ $isUnavailable ? 'color:#9CA3AF;' : '' }}"
+                        >
+                            {{ $facility->name }}{{ $isUnavailable ? ' (' . $statusLabel . ')' : '' }}
+                        </option>
+                    @endforeach
+                @endif
             </select>
         </div>
 
-        {{-- Noted by --}}
+        {{-- Noted by (Guest fills custom name) --}}
         <div>
             <h2 class="text-sm font-semibold text-gray-700 mb-2">Noted by</h2>
-            <label class="block text-sm font-medium text-gray-700 mb-1">Select signatory</label>
-            <select name="noted_signatory_id"
-                    id="noted_signatory_id"
-                    class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3">
-                <option value="custom">Custom name (type below)</option>
-                @foreach($presidents as $s)
-                    <option value="org_president:{{ $s->id }}" {{ old('noted_signatory_id') == "org_president:{$s->id}" ? 'selected' : '' }}>
-                        President – {{ $s->name }} ({{ $s->unit }})
-                    </option>
-                @endforeach
-                @foreach($advisers as $s)
-                    <option value="org_adviser:{{ $s->id }}" {{ old('noted_signatory_id') == "org_adviser:{$s->id}" ? 'selected' : '' }}>
-                        Adviser – {{ $s->name }} ({{ $s->unit }})
-                    </option>
-                @endforeach
-            </select>
-
-            <div class="mt-3 hidden" id="custom-noted-input">
-                <label class="block text-sm font-medium text-gray-700">Custom name</label>
-                <input type="text" name="noted_signatory_custom"
-                       class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3"
-                       value="{{ old('noted_signatory_custom') }}"
-                       placeholder="Enter specific name">
-            </div>
+            <label class="block text-sm font-medium text-gray-700 mb-1">Contact Person / Organization Representative</label>
+            <input type="text" name="noted_signatory_custom"
+                   class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 bg-white"
+                   placeholder="Enter the name of your organization representative"
+                   value="{{ old('noted_signatory_custom') }}" required>
+            <p class="text-xs text-gray-500 mt-1">Enter the name of the person from your organization who is responsible for this request.</p>
         </div>
 
         {{-- Purpose --}}
         <div>
             <label for="purpose" class="block text-sm font-medium text-gray-700">Purpose</label>
             <textarea name="purpose" id="purpose" rows="3" required
-                      class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3">{{ old('purpose') }}</textarea>
+                      class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 bg-white">{{ old('purpose') }}</textarea>
         </div>
 
         {{-- Equipment --}}
@@ -123,16 +112,16 @@
                     <div>
                         <label class="block text-sm font-medium text-gray-700">{{ $label }}</label>
                         <div class="mt-1 flex items-center space-x-2">
-                            <button type="button" class="px-2 py-1 border rounded text-sm"
+                            <button type="button" class="px-2 py-1 border rounded text-sm bg-white"
                                     onclick="adjustQty('{{ $name }}', -10)">-10</button>
-                            <button type="button" class="px-2 py-1 border rounded text-sm"
+                            <button type="button" class="px-2 py-1 border rounded text-sm bg-white"
                                     onclick="adjustQty('{{ $name }}', -1)">-1</button>
                             <input type="number" name="{{ $name }}" id="{{ $name }}" min="0"
-                                   class="w-20 border border-gray-300 rounded-md py-1 px-2 text-center"
+                                   class="w-20 border border-gray-300 rounded-md py-1 px-2 text-center bg-white"
                                    value="{{ old($name, 0) }}">
-                            <button type="button" class="px-2 py-1 border rounded text-sm"
+                            <button type="button" class="px-2 py-1 border rounded text-sm bg-white"
                                     onclick="adjustQty('{{ $name }}', 1)">+1</button>
-                            <button type="button" class="px-2 py-1 border rounded text-sm"
+                            <button type="button" class="px-2 py-1 border rounded text-sm bg-white"
                                     onclick="adjustQty('{{ $name }}', 10)">+10</button>
                         </div>
                     </div>
@@ -140,27 +129,27 @@
             </div>
         </div>
 
-        {{-- Payment Attachment (Optional) --}}
+        {{-- Payment Attachment (Required for Guests) --}}
         <div>
-            <label class="block text-sm font-medium text-gray-700 mb-2">Payment Receipt (Optional)</label>
-            <p class="text-xs text-gray-600 mb-2">Upload payment receipt if payment is required (JPG, PNG, or PDF, max 5MB)</p>
-            <input type="file" name="payment_attachment" accept=".jpg,.jpeg,.png,.pdf"
+            <label class="block text-sm font-medium text-gray-700 mb-2">Payment Receipt <span class="text-red-500">*</span></label>
+            <p class="text-xs text-gray-600 mb-2">Upload payment receipt (JPG, PNG, or PDF, max 5MB). Payment is required for all guest bookings.</p>
+            <input type="file" name="payment_attachment" accept=".jpg,.jpeg,.png,.pdf" required
                    class="w-full border border-gray-300 rounded-md py-2 px-3 text-sm bg-white hover:border-gray-400 focus:outline-none focus:ring-1 focus:ring-blue-500">
-            <p class="text-xs text-gray-500 mt-1">If you upload a payment receipt, your request will be marked as "Pending Payment" until GSU verifies it.</p>
+            <p class="text-xs text-gray-500 mt-1">Your request will be marked as "Pending Payment" until GSU verifies the receipt.</p>
         </div>
 
         {{-- Attachments (optional) --}}
         <div>
             <label class="block text-sm font-medium text-gray-700 mb-2">Attachments (Optional)</label>
             <p class="text-xs text-gray-600 mb-2">Upload supporting documents (PDFs only, max 5-10 files)</p>
-            <input type="file" name="attachments[]" multiple accept=".pdf" 
+            <input type="file" name="attachments[]" multiple accept=".pdf"
                    class="w-full border border-gray-300 rounded-md py-2 px-3 text-sm bg-white hover:border-gray-400 focus:outline-none focus:ring-1 focus:ring-blue-500"
                    title="Select 5-10 PDF files maximum">
         </div>
 
         {{-- Submit --}}
         <div class="flex justify-end space-x-4 pt-4">
-            <a href="{{ route('org.dashboard') }}" class="px-4 py-2 border border-gray-300 rounded-md text-gray-700 hover:bg-gray-50">
+            <a href="{{ route('guest.dashboard') }}" class="px-4 py-2 border border-gray-300 rounded-md text-gray-700 hover:bg-gray-50 bg-white">
                 Cancel
             </a>
             <button type="submit" id="submitBtn" class="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700">
@@ -199,24 +188,6 @@ function adjustQty(fieldId, delta) {
                 submitBtn.classList.remove('opacity-50', 'cursor-not-allowed');
             }, 5000);
         });
-    }
-
-    const notedSelect = document.getElementById('noted_signatory_id');
-    const customInput = document.getElementById('custom-noted-input');
-
-    function updateNotedUI() {
-        if (!notedSelect) return;
-        const val = notedSelect.value;
-        if (val === 'custom') {
-            customInput.classList.remove('hidden');
-        } else {
-            customInput.classList.add('hidden');
-        }
-    }
-
-    if (notedSelect) {
-        notedSelect.addEventListener('change', updateNotedUI);
-        updateNotedUI();
     }
 })();
 </script>

@@ -70,6 +70,10 @@ class AuthController extends Controller
             return redirect()->route('org.dashboard');
         }
 
+        if ($user->isGuest()) {
+            return redirect()->route('guest.dashboard');
+        }
+
         return redirect()->route('home');
     }
 }

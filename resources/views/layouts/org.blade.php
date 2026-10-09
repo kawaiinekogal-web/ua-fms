@@ -24,6 +24,13 @@
                     ['label' => 'New request', 'route' => 'org.requests.facilities.create', 'routes' => 'org.requests.facilities.create'],
                 ],
             ],
+            [
+                'heading' => 'Maintenance',
+                'links' => [
+                    ['label' => 'My repair requests', 'route' => 'org.maintenance-tickets.index'],
+                    ['label' => 'New repair request', 'route' => 'org.maintenance-tickets.create'],
+                ],
+            ],
         ],
         'footer' => '<span class="text-black font-medium">Organization</span><br>' . e(optional(auth()->user())->organization_name ?? 'Not set'),
     ])

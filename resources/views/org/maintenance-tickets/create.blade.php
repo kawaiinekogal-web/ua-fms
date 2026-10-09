@@ -1,13 +1,13 @@
-@extends('layouts.college')
+@extends('layouts.org')
 
-@section('college-content')
+@section('org-content')
 <div class="fms-card max-w-3xl">
     <div class="fms-page-header">
         <div>
             <h1 class="fms-page-title">New repair request</h1>
             <p class="text-sm text-neutral-600">Send a message to the facility administrators.</p>
         </div>
-        <a href="{{ route('college.maintenance-tickets.index') }}" class="fms-btn-secondary">My requests</a>
+        <a href="{{ route('org.maintenance-tickets.index') }}" class="fms-btn-secondary">My requests</a>
     </div>
 
     @if ($errors->any())
@@ -21,11 +21,11 @@
     @endif
 
     <div class="mb-5 border-l-4 border-black bg-neutral-50 px-4 py-3 text-sm">
-        <p><strong>From:</strong> {{ auth()->user()->name }} ({{ auth()->user()->college_name ?: 'College account' }})</p>
+        <p><strong>From:</strong> {{ auth()->user()->name }} ({{ auth()->user()->organization_name ?: 'Organization account' }})</p>
         <p><strong>To:</strong> Facility administrators</p>
     </div>
 
-    <form method="POST" action="{{ route('college.maintenance-tickets.store') }}" class="space-y-5">
+    <form method="POST" action="{{ route('org.maintenance-tickets.store') }}" class="space-y-5">
         @csrf
         <div>
             <label for="facility_id" class="mb-1 block text-sm font-medium">Facility</label>
@@ -49,7 +49,7 @@
                       class="fms-input" placeholder="Describe the repair or maintenance needed, including where and when you noticed it.">{{ old('issue_description') }}</textarea>
         </div>
         <div class="flex justify-end gap-2">
-            <a href="{{ route('college.maintenance-tickets.index') }}" class="fms-btn-secondary">Cancel</a>
+            <a href="{{ route('org.maintenance-tickets.index') }}" class="fms-btn-secondary">Cancel</a>
             <button type="submit" id="submitBtn" class="fms-btn-primary">Send request</button>
         </div>
     </form>

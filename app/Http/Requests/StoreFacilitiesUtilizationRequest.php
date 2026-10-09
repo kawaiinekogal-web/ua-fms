@@ -64,6 +64,9 @@ class StoreFacilitiesUtilizationRequest extends FormRequest
             // Noted by (signatory)
             'noted_signatory_id' => 'nullable|string',
             'noted_signatory_custom' => 'nullable|string|max:255',
+
+            // Payment attachment
+            'payment_attachment' => 'nullable|file|mimes:jpg,jpeg,png,pdf|max:5120', // 5MB max
         ];
     }
 }

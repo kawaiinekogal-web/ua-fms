@@ -18,7 +18,7 @@
         </div>
     @endif
 
-    <form method="POST" action="{{ route('college.requests.facilities.store') }}" class="space-y-6">
+    <form method="POST" action="{{ route('college.requests.facilities.store') }}" class="space-y-6" enctype="multipart/form-data">
         @csrf
 
         {{-- Date & Time --}}
@@ -168,6 +168,15 @@
             </div>
         </div>
 
+        {{-- Payment Attachment (Optional) --}}
+        <div>
+            <label class="block text-sm font-medium text-gray-700 mb-2">Payment Receipt (Optional)</label>
+            <p class="text-xs text-gray-600 mb-2">Upload payment receipt if payment is required (JPG, PNG, or PDF, max 5MB)</p>
+            <input type="file" name="payment_attachment" accept=".jpg,.jpeg,.png,.pdf"
+                   class="w-full border border-gray-300 rounded-md py-2 px-3 text-sm bg-white hover:border-gray-400 focus:outline-none focus:ring-1 focus:ring-blue-500">
+            <p class="text-xs text-gray-500 mt-1">If you upload a payment receipt, your request will be marked as "Pending Payment" until GSU verifies it.</p>
+        </div>
+
         {{-- Attachments (optional) --}}
         <div>
             <label class="block text-sm font-medium text-gray-700 mb-2">Attachments (Optional)</label>
@@ -182,7 +191,7 @@
             <a href="{{ url()->previous() }}" class="px-4 py-2 border border-gray-300 rounded-md text-gray-700 hover:bg-gray-50 bg-white">
                 Cancel
             </a>
-            <button type="submit" class="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700">
+            <button type="submit" id="submitBtn" class="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700">
                 Submit Request
             </button>
         </div>
@@ -199,7 +208,27 @@ function adjustQty(fieldId, delta) {
     input.value = value;
 }
 
+// Prevent double submission
 (function() {
+    const form = document.querySelector('form');
+    const submitBtn = document.getElementById('submitBtn');
+
+    if (form && submitBtn) {
+        form.addEventListener('submit', function(e) {
+            // Disable button and show loading state
+            submitBtn.disabled = true;
+            submitBtn.textContent = 'Submitting...';
+            submitBtn.classList.add('opacity-50', 'cursor-not-allowed');
+
+            // Re-enable after 5 seconds as fallback (in case of validation errors)
+            setTimeout(function() {
+                submitBtn.disabled = false;
+                submitBtn.textContent = 'Submit Request';
+                submitBtn.classList.remove('opacity-50', 'cursor-not-allowed');
+            }, 5000);
+        });
+    }
+
     const notedSelect = document.getElementById('noted_signatory_id');
     const customInput = document.getElementById('custom-noted-input');
 

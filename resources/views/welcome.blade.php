@@ -137,14 +137,20 @@ input,select,textarea,button{font-family:inherit}
   text-align: left; /* Makes the paragraph look cleaner like a block */
 }
 
-/* Right Content: 3 Portrait Cards */
+/* Right Content: 4 Portrait Cards */
 .ua-portrait-cards {
   display: grid;
-  grid-template-columns: repeat(3, 1fr);
+  grid-template-columns: repeat(4, 1fr);
   gap: 16px;
 }
 
-@media (max-width: 640px) {
+@media (max-width: 768px) {
+  .ua-portrait-cards {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (max-width: 480px) {
   .ua-portrait-cards {
     grid-template-columns: 1fr;
   }
@@ -343,12 +349,12 @@ input,select,textarea,button{font-family:inherit}
 }
 
 /* ── FOOTER ── */
-.footer{background:var(--primary);padding:48px;color:#fff;display:grid;grid-template-columns:1fr 1fr;gap:48px}
-.footer-left img{width:64px;margin-bottom:16px;filter:brightness(0) invert(1)}
-.footer h4{font-family:var(--display);font-size:20px;margin-bottom:8px}
-.footer p{font-size:12px;color:#ccc;line-height:1.6}
+.footer{background:var(--primary);padding:32px 48px;color:#fff;display:grid;grid-template-columns:1fr 1fr;gap:32px}
+.footer-left img{width:48px;margin-bottom:12px;filter:brightness(0) invert(1)}
+.footer h4{font-family:var(--display);font-size:16px;margin-bottom:6px}
+.footer p{font-size:11px;color:#ccc;line-height:1.5}
 .footer-right{text-align:right}
-.footer-bottom{grid-column:1/-1;border-top:1px solid #333;padding-top:24px;margin-top:24px;display:flex;justify-content:space-between;font-size:11px;color:#999}
+.footer-bottom{grid-column:1/-1;border-top:1px solid #333;padding-top:16px;margin-top:16px;display:flex;justify-content:space-between;font-size:10px;color:#999}
 </style>
 
 {{-- HERO CAROUSEL --}}
@@ -414,6 +420,14 @@ document.addEventListener('DOMContentLoaded', function() {
         <div class="ua-card-text">
           <h3>Org<br>Unit</h3>
           <p>Student org requests & event scheduling</p>
+        </div>
+        <span class="ua-simple-btn">Log In</span>
+      </a>
+
+      <a href="{{ route('login') }}" class="ua-portrait-card">
+        <div class="ua-card-text">
+          <h3>Guest<br>Access</h3>
+          <p>External users & partner organization bookings</p>
         </div>
         <span class="ua-simple-btn">Log In</span>
       </a>

@@ -111,9 +111,60 @@
         </table>
     @endif
 
+    {{-- Payment Information --}}
+    @if($submission->payment_attachment)
+        <div class="mt-6 border-t pt-4">
+            <h2 class="text-sm font-semibold text-gray-700 mb-3">Payment Information</h2>
+            <dl class="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm mb-4">
+                <div>
+                    <dt class="font-semibold text-gray-700">Payment Status</dt>
+                    <dd class="text-gray-800">
+                        @if($submission->payment_status === 'payment_uploaded')
+                            <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-yellow-100 text-yellow-800">
+                                Awaiting Verification
+                            </span>
+                        @elseif($submission->payment_status === 'payment_verified')
+                            <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">
+                                Verified
+                            </span>
+                        @else
+                            <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-gray-100 text-gray-800">
+                                {{ ucfirst(str_replace('_', ' ', $submission->payment_status)) }}
+                            </span>
+                        @endif
+                    </dd>
+                </div>
+                <div>
+                    <dt class="font-semibold text-gray-700">Payment Receipt</dt>
+                    <dd class="text-gray-800">
+                        <a href="{{ asset('storage/' . $submission->payment_attachment) }}" target="_blank"
+                           class="text-blue-600 hover:text-blue-800 underline">
+                            View Attachment
+                        </a>
+                    </dd>
+                </div>
+            </dl>
+
+            @if($submission->payment_status === 'payment_uploaded')
+                <form method="POST" action="{{ route('admin.forms.facilities.verify-payment', $submission) }}" class="inline">
+                    @csrf
+                    <button type="submit" class="px-4 py-2 bg-green-600 text-white rounded hover:bg-green-700 text-sm">
+                        Verify Payment
+                    </button>
+                </form>
+            @endif
+        </div>
+    @endif
+
     {{-- Actions --}}
     <div class="flex flex-wrap items-center gap-3 mt-4">
-        @if($submission->status === 'pending')
+        @if($submission->status === 'pending_payment')
+            <p class="text-sm text-yellow-700 bg-yellow-50 px-3 py-2 rounded border border-yellow-200">
+                This request has payment uploaded. Please verify the payment before approving.
+            </p>
+        @endif
+
+        @if($submission->status === 'pending' || ($submission->status === 'pending_payment' && $submission->payment_status === 'payment_verified'))
             <form method="POST" action="{{ route('admin.forms.facilities.approve', $submission) }}">
                 @csrf
                 <button type="submit" class="px-4 py-2 bg-green-600 text-white rounded hover:bg-green-700 text-sm">
@@ -128,6 +179,12 @@
             </form>
         @endif
 
+        @if($submission->status === 'approved')
+            <p class="text-sm text-green-700 bg-green-50 px-3 py-2 rounded border border-green-200">
+                ✓ This request has been approved.
+            </p>
+        @endif
+
         @if($submission->status === 'reserved')
             {{-- Generate PDF once the request has been converted to a reservation --}}
             <form method="GET" action="{{ route('admin.forms.facilities.pdf', $submission) }}">
@@ -136,17 +193,6 @@
                 </button>
             </form>
         @endif
-
-        @if($submission->status === 'approved')
-            {{-- Convert to reservation after physical signing --}}
-            <form method="POST" action="{{ route('admin.forms.facilities.set-reservation', $submission) }}">
-                @csrf
-                <button type="submit" class="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 text-sm">
-                    Set Reservation
-                </button>
-            </form>
-        @endif
     </div>
 </div>
 @endsection
- 

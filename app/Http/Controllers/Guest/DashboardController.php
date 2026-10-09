@@ -1,10 +1,10 @@
 <?php
 
-namespace App\Http\Controllers\College;
+namespace App\Http\Controllers\Guest;
 
 use App\Http\Controllers\Controller;
 use App\Models\FormSubmission;
-use App\Models\MaintenanceTicket;
+use App\Models\Booking;
 use Illuminate\Http\Request;
 
 class DashboardController extends Controller
@@ -33,16 +33,14 @@ class DashboardController extends Controller
         ];
         $facilitiesStats['total'] = array_sum($facilitiesStats);
 
-        // Maintenance Tickets Statistics (only for this user)
-        $maintenanceStats = [
-            'pending' => MaintenanceTicket::where('requester_id', $userId)->where('status', 'pending')->count(),
-            'notified' => MaintenanceTicket::where('requester_id', $userId)->where('status', 'notified')->count(),
-            'in_progress' => MaintenanceTicket::where('requester_id', $userId)->where('status', 'in_progress')->count(),
-            'completed' => MaintenanceTicket::where('requester_id', $userId)->where('status', 'completed')->count(),
-            'rejected' => MaintenanceTicket::where('requester_id', $userId)->where('status', 'rejected')->count(),
-        ];
-        $maintenanceStats['total'] = array_sum($maintenanceStats);
+        // Upcoming Events (All bookings - public view)
+        $upcomingEvents = Booking::with(['facilities', 'requester'])
+            ->where('status', 'reserved')
+            ->where('start_time', '>=', now())
+            ->orderBy('start_time')
+            ->limit(5)
+            ->get();
 
-        return view('college.dashboard', compact('facilitiesStats', 'maintenanceStats'));
+        return view('guest.dashboard', compact('facilitiesStats', 'upcomingEvents'));
     }
 }

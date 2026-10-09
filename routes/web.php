@@ -10,6 +10,9 @@ use App\Http\Controllers\College\FacilityController as CollegeFacilityController
 use App\Http\Controllers\College\FormController as CollegeFormController;
 use App\Http\Controllers\Org\DashboardController as OrgDashboardController;
 use App\Http\Controllers\Org\FormController as OrgFormController;
+use App\Http\Controllers\Guest\DashboardController as GuestDashboardController;
+use App\Http\Controllers\Guest\FormController as GuestFormController;
+use App\Http\Controllers\Guest\BookingController as GuestBookingController;
 
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\GsuFormController;
@@ -78,6 +81,8 @@ Route::middleware(['auth', 'role:admin'])->group(function () {
         ->name('admin.forms.facilities.approve');
     Route::post('/admin/forms/facilities/{submission}/disapprove', [\App\Http\Controllers\Admin\FormSubmissionController::class, 'disapprove'])
         ->name('admin.forms.facilities.disapprove');
+    Route::post('/admin/forms/facilities/{submission}/verify-payment', [\App\Http\Controllers\Admin\FormSubmissionController::class, 'verifyPayment'])
+        ->name('admin.forms.facilities.verify-payment');
     Route::post('/admin/forms/facilities/{submission}/set-reservation', [\App\Http\Controllers\Admin\FormSubmissionController::class, 'setReservation'])
         ->name('admin.forms.facilities.set-reservation');
 
@@ -177,6 +182,16 @@ Route::middleware(['auth', 'role:org_staff'])->group(function () {
     Route::get('/org/calendar', [\App\Http\Controllers\Org\BookingController::class, 'calendar'])
         ->name('org.bookings.calendar');
 
+    // Org Maintenance Requests
+    Route::get('/org/maintenance-requests', [\App\Http\Controllers\Org\MaintenanceTicketController::class, 'index'])
+        ->name('org.maintenance-tickets.index');
+    Route::get('/org/maintenance-requests/create', [\App\Http\Controllers\Org\MaintenanceTicketController::class, 'create'])
+        ->name('org.maintenance-tickets.create');
+    Route::post('/org/maintenance-requests', [\App\Http\Controllers\Org\MaintenanceTicketController::class, 'store'])
+        ->name('org.maintenance-tickets.store');
+    Route::get('/org/maintenance-requests/{ticket}', [\App\Http\Controllers\Org\MaintenanceTicketController::class, 'show'])
+        ->name('org.maintenance-tickets.show');
+
     // Facilities Utilization Form (Org → GSU)
     Route::get('/org/requests/facilities', [OrgFormController::class, 'createFacilities'])
         ->name('org.requests.facilities.create');
@@ -191,4 +206,30 @@ Route::middleware(['auth', 'role:org_staff'])->group(function () {
         '/org/requests/facilities/{submission}/cancel',
         [OrgFormController::class, 'cancelFacilities']
     )->name('org.requests.facilities.cancel');
+});
+
+// Guest (External Users)
+Route::middleware(['auth', 'role:guest'])->group(function () {
+    Route::get('/guest/dashboard', [GuestDashboardController::class, 'index'])->name('guest.dashboard');
+
+    // Bookings
+    Route::get('/guest/bookings', [GuestBookingController::class, 'index'])
+        ->name('guest.bookings.index');
+    Route::get('/guest/calendar', [GuestBookingController::class, 'calendar'])
+        ->name('guest.bookings.calendar');
+
+    // Facilities Utilization Form (Guest → GSU)
+    Route::get('/guest/requests/facilities', [GuestFormController::class, 'createFacilities'])
+        ->name('guest.requests.facilities.create');
+    Route::post('/guest/requests/facilities', [GuestFormController::class, 'storeFacilities'])
+        ->name('guest.requests.facilities.store');
+    Route::get('/guest/requests/facilities/index', [GuestFormController::class, 'indexFacilities'])
+        ->name('guest.requests.facilities.index');
+    Route::get('/guest/requests/facilities/{submission}', [GuestFormController::class, 'showFacilities'])
+        ->name('guest.requests.facilities.show');
+
+    Route::post(
+        '/guest/requests/facilities/{submission}/cancel',
+        [GuestFormController::class, 'cancelFacilities']
+    )->name('guest.requests.facilities.cancel');
 });

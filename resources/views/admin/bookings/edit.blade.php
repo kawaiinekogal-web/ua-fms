@@ -48,15 +48,16 @@
 
         <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div>
-                <label class="fms-label" for="facility_id">Facility</label>
-                <select id="facility_id" name="facility_id" class="fms-input" style="width: 100%; padding: 8px; border: 1px solid #d1d5db; border-radius: 4px;">
+                <label class="fms-label" for="facility_ids">Facilities (can select multiple)</label>
+                <select id="facility_ids" name="facility_ids[]" multiple class="fms-input" style="width: 100%; padding: 8px; border: 1px solid #d1d5db; border-radius: 4px; min-height: 120px;">
                     @foreach($facilities as $facility)
                         <option value="{{ $facility->id }}"
-                            {{ $booking->facility_id === $facility->id ? 'selected' : '' }}>
+                            {{ $booking->facilities->contains($facility->id) ? 'selected' : '' }}>
                             {{ $facility->name }} ({{ $facility->location }})
                         </option>
                     @endforeach
                 </select>
+                <p class="text-xs text-neutral-500 mt-1">Hold Ctrl (or Cmd) to select multiple facilities</p>
             </div>
             @php
                 $currentDate = $booking->start_time ? $booking->start_time->toDateString() : now()->toDateString();

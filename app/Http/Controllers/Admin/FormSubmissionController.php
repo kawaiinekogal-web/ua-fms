@@ -91,6 +91,11 @@ class FormSubmissionController extends Controller
             abort(404);
         }
 
+        // Check if payment is required and uploaded but not verified
+        if ($submission->payment_status === 'payment_uploaded') {
+            return back()->withErrors(['status' => 'Please verify the payment attachment before approving this request.']);
+        }
+
         $submission->status = 'approved';
         $payload = $submission->payload ?? [];
 
@@ -109,8 +114,19 @@ class FormSubmissionController extends Controller
             $this->notifications->notifyFormApproved($submission->requester_id, $submission->id);
         }
 
+        // Automatically create booking/reservation
+        $result = $this->bookingService->createFromSubmission($submission);
+
+        if (is_string($result)) {
+            // If booking creation failed, show error but keep the approval
+            return redirect()->route('admin.forms.facilities.index')
+                ->with('error', 'Request approved, but booking creation failed: ' . $result);
+        }
+
+        $booking = $result;
+
         return redirect()->route('admin.forms.facilities.index')
-            ->with('status', 'Request approved. Requester must proceed to GSU office to sign and finalize the form.');
+            ->with('status', "Request approved and reservation created (Code: {$booking->booking_code}). It will now appear on the calendar.");
     }
 
     /**
@@ -162,6 +178,24 @@ class FormSubmissionController extends Controller
 
         return redirect()->route('admin.forms.facilities.index')
             ->with('status', "Reservation created (Code: {$booking->booking_code}) and request marked as reserved.");
+    }
+
+    /**
+     * Verify payment attachment for a submission.
+     */
+    public function verifyPayment(FormSubmission $submission)
+    {
+        if ($submission->type !== 'facilities_utilization') {
+            abort(404);
+        }
+
+        if ($submission->payment_status !== 'payment_uploaded') {
+            return back()->withErrors(['status' => 'No payment to verify.']);
+        }
+
+        $submission->markPaymentVerified();
+
+        return back()->with('status', 'Payment verified successfully.');
     }
 
 }
